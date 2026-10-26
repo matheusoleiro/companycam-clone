@@ -42,28 +42,31 @@ export async function POST(request: NextRequest) {
         if (session.subscription) {
           // Get customer metadata
           const customer = await stripe.customers.retrieve(session.customer as string);
-          const userId = (customer.metadata as any)?.user_id;
 
-          if (userId) {
-            // Update subscription in database
-            await supabase
-              .from('subscriptions')
-              .upsert({
-                user_id: userId,
-                stripe_customer_id: customer.id,
-                stripe_subscription_id: session.subscription as string,
-                tier: (customer.metadata as any)?.tier || 'core',
-                status: 'active',
-              });
+          if ('deleted' in customer && !customer.deleted && 'metadata' in customer) {
+            const userId = (customer.metadata as any)?.user_id;
 
-            // Update user subscription tier
-            await supabase
-              .from('users')
-              .update({
-                subscription_tier: (customer.metadata as any)?.tier || 'core',
-                subscription_status: 'active',
-              })
-              .eq('id', userId);
+            if (userId) {
+              // Update subscription in database
+              await supabase
+                .from('subscriptions')
+                .upsert({
+                  user_id: userId,
+                  stripe_customer_id: customer.id,
+                  stripe_subscription_id: session.subscription as string,
+                  tier: (customer.metadata as any)?.tier || 'core',
+                  status: 'active',
+                });
+
+              // Update user subscription tier
+              await supabase
+                .from('users')
+                .update({
+                  subscription_tier: (customer.metadata as any)?.tier || 'core',
+                  subscription_status: 'active',
+                })
+                .eq('id', userId);
+            }
           }
         }
         break;
