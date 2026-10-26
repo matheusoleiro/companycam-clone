@@ -93,27 +93,28 @@ export default function ProjectDetailPage() {
   return (
     <MainLayout>
       <div className="max-w-6xl mx-auto px-4 py-6">
-        {/* Project Header - Details */}
+        {/* Project Header */}
         {currentProject && (
-          <div className="mb-6 flex items-start justify-between">
-            <div className="flex-1">
-              {currentProject.address && (
-                <p className="text-sm text-slate-600 mb-1">{currentProject.address}</p>
-              )}
-              {currentProject.description && (
-                <p className="text-slate-700 mb-3">{currentProject.description}</p>
-              )}
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-2">
+              <h1 className="text-3xl font-bold text-slate-900">{currentProject.name}</h1>
+              <button
+                onClick={() => {
+                  setEditName(currentProject.name);
+                  setIsEditingName(true);
+                }}
+                className="p-2 text-slate-400 hover:text-slate-600"
+                title="Editar nome"
+              >
+                <Edit2 className="w-5 h-5" />
+              </button>
             </div>
-            <button
-              onClick={() => {
-                setEditName(currentProject.name);
-                setIsEditingName(true);
-              }}
-              className="p-2 text-slate-400 hover:text-slate-600"
-              title="Editar nome"
-            >
-              <Edit2 className="w-5 h-5" />
-            </button>
+            {currentProject.address && (
+              <p className="text-sm text-slate-600 mb-1">{currentProject.address}</p>
+            )}
+            {currentProject.description && (
+              <p className="text-slate-700 mb-3">{currentProject.description}</p>
+            )}
           </div>
         )}
 
