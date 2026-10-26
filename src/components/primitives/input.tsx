@@ -6,14 +6,14 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   helperText?: string;
-  size?: 'sm' | 'md' | 'lg';
+  variant?: 'sm' | 'md' | 'lg';
 }
 
 export function Input({
   label,
   error,
   helperText,
-  size = 'md',
+  variant = 'md',
   disabled = false,
   className,
   ...props
@@ -41,7 +41,7 @@ export function Input({
           transition-colors duration-base
           disabled:opacity-50 disabled:cursor-not-allowed
           ${error ? 'border-red-500 focus-visible:outline-red-500' : ''}
-          ${sizeClasses[size]}
+          ${sizeClasses[variant]}
           ${className || ''}
         `}
         {...props}
