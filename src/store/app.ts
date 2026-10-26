@@ -17,7 +17,7 @@ interface AppState {
   selectProject: (id: string) => Promise<void>;
   clearCurrentProject: () => void;
   createProject: (name: string, address?: string) => Promise<Project>;
-  updateProject: (id: string, name: string, address?: string) => Promise<void>;
+  updateProject: (id: string, name: string, address?: string, description?: string) => Promise<void>;
   deleteProject: (id: string) => Promise<void>;
 
   // Photos
@@ -118,11 +118,11 @@ export const useApp = create<AppState>((set, get) => ({
     set(state => ({ projects: [...state.projects, data.project] }));
     return data.project;
   },
-  updateProject: async (id, name, address) => {
+  updateProject: async (id, name, address, description) => {
     const response = await fetch(`/api/projects?id=${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, address }),
+      body: JSON.stringify({ name, address, description }),
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error);

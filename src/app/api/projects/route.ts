@@ -116,7 +116,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, address } = body;
+    const { name, address, description } = body;
 
     if (!name) {
       return NextResponse.json(
@@ -130,6 +130,7 @@ export async function PATCH(request: NextRequest) {
       .update({
         name,
         ...(address !== undefined && { address }),
+        ...(description !== undefined && { description }),
       })
       .eq('id', projectId)
       .eq('user_id', userId)

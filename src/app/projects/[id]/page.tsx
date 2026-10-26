@@ -15,11 +15,10 @@ export default function ProjectDetailPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'timeline'>('grid');
   const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isEditingName, setIsEditingName] = useState(false);
+  const [isEditingProject, setIsEditingProject] = useState(false);
   const [editName, setEditName] = useState(currentProject?.name || '');
-  const [isEditingDetails, setIsEditingDetails] = useState(false);
   const [editAddress, setEditAddress] = useState(currentProject?.address || '');
-  const [editDate, setEditDate] = useState(currentProject?.start_date?.split('T')[0] || '');
+  const [editDescription, setEditDescription] = useState(currentProject?.description || '');
   const [photoSortOrder, setPhotoSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [isEditingPhotoName, setIsEditingPhotoName] = useState(false);
   const [editingPhotoId, setEditingPhotoId] = useState<string | null>(null);
@@ -71,27 +70,15 @@ export default function ProjectDetailPage() {
     }
   };
 
-  const handleUpdateName = async (e: React.FormEvent) => {
+  const handleUpdateProject = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editName.trim() || !currentProject) return;
 
     try {
-      await updateProject(currentProject.id, editName);
-      setIsEditingName(false);
+      await updateProject(currentProject.id, editName, editAddress || undefined, editDescription || undefined);
+      setIsEditingProject(false);
     } catch (err) {
       console.error('Error updating project:', err);
-    }
-  };
-
-  const handleUpdateDetails = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!currentProject) return;
-
-    try {
-      await updateProject(currentProject.id, currentProject.name, editAddress || undefined);
-      setIsEditingDetails(false);
-    } catch (err) {
-      console.error('Error updating project details:', err);
     }
   };
 
@@ -140,39 +127,28 @@ export default function ProjectDetailPage() {
               <button
                 onClick={() => {
                   setEditName(currentProject.name);
-                  setIsEditingName(true);
+                  setEditAddress(currentProject.address || '');
+                  setEditDescription(currentProject.description || '');
+                  setIsEditingProject(true);
                 }}
                 className="p-2 text-slate-400 hover:text-slate-600"
-                title="Editar nome"
+                title="Editar projeto"
               >
                 <Edit2 className="w-5 h-5" />
               </button>
             </div>
-            <div className="flex items-start gap-4">
-              <div className="flex-1">
-                {currentProject.address && (
-                  <p className="text-sm text-slate-600 mb-1">{currentProject.address}</p>
-                )}
-                {currentProject.start_date && (
-                  <p className="text-sm text-slate-600 mb-1">
-                    {new Date(currentProject.start_date).toLocaleDateString()}
-                  </p>
-                )}
-                {currentProject.description && (
-                  <p className="text-slate-700 mb-3">{currentProject.description}</p>
-                )}
-              </div>
-              <button
-                onClick={() => {
-                  setEditAddress(currentProject.address || '');
-                  setEditDate(currentProject.start_date?.split('T')[0] || '');
-                  setIsEditingDetails(true);
-                }}
-                className="p-2 text-slate-400 hover:text-slate-600 flex-shrink-0"
-                title="Editar detalhes"
-              >
-                <Edit2 className="w-5 h-5" />
-              </button>
+            <div className="flex-1">
+              {currentProject.address && (
+                <p className="text-sm text-slate-600 mb-1">{currentProject.address}</p>
+              )}
+              {currentProject.start_date && (
+                <p className="text-sm text-slate-600 mb-1">
+                  {new Date(currentProject.start_date).toLocaleDateString()}
+                </p>
+              )}
+              {currentProject.description && (
+                <p className="text-slate-700 mb-3">{currentProject.description}</p>
+              )}
             </div>
           </div>
         )}
@@ -363,29 +339,54 @@ export default function ProjectDetailPage() {
           </div>
         )}
 
-        {/* Edit Name Modal */}
-        {isEditingName && (
+        {/* Edit Project Modal */}
+        {isEditingProject && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-              <h2 className="text-xl font-bold text-slate-900 mb-4">Renomear Projeto</h2>
-              <form onSubmit={handleUpdateName} className="space-y-4">
+              <h2 className="text-xl font-bold text-slate-900 mb-4">Editar Projeto</h2>
+              <form onSubmit={handleUpdateProject} className="space-y-4">
                 <div>
                   <label className="block text-sm font-semibold text-slate-900 mb-2">
-                    Novo nome
+                    Nome *
                   </label>
                   <input
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    placeholder="Digite o novo nome"
+                    placeholder="Nome do projeto"
                     className="w-full px-4 py-2 border-2 border-slate-300 rounded-lg bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base"
                     autoFocus
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-900 mb-2">
+                    Endereço
+                  </label>
+                  <input
+                    type="text"
+                    value={editAddress}
+                    onChange={(e) => setEditAddress(e.target.value)}
+                    placeholder="123 Main St, Springfield, IL"
+                    className="w-full px-4 py-2 border-2 border-slate-300 rounded-lg bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-900 mb-2">
+                    Descrição
+                  </label>
+                  <textarea
+                    value={editDescription}
+                    onChange={(e) => setEditDescription(e.target.value)}
+                    placeholder="Descrição do projeto"
+                    className="w-full px-4 py-2 border-2 border-slate-300 rounded-lg bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base"
+                    rows={3}
                   />
                 </div>
                 <div className="flex gap-3 pt-2">
                   <button
                     type="button"
-                    onClick={() => setIsEditingName(false)}
+                    onClick={() => setIsEditingProject(false)}
                     className="flex-1 px-4 py-2 text-slate-900 bg-slate-100 border border-slate-300 rounded-lg hover:bg-slate-200 font-medium"
                   >
                     Cancelar
@@ -444,54 +445,6 @@ export default function ProjectDetailPage() {
           </div>
         )}
 
-        {/* Edit Details Modal */}
-        {isEditingDetails && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-              <h2 className="text-xl font-bold text-slate-900 mb-4">Editar Detalhes do Projeto</h2>
-              <form onSubmit={handleUpdateDetails} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold text-slate-900 mb-2">
-                    Endereço
-                  </label>
-                  <input
-                    type="text"
-                    value={editAddress}
-                    onChange={(e) => setEditAddress(e.target.value)}
-                    placeholder="123 Main St, Springfield, IL"
-                    className="w-full px-4 py-2 border-2 border-slate-300 rounded-lg bg-white text-slate-900 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-900 mb-2">
-                    Data de Início
-                  </label>
-                  <input
-                    type="date"
-                    value={editDate}
-                    onChange={(e) => setEditDate(e.target.value)}
-                    className="w-full px-4 py-2 border-2 border-slate-300 rounded-lg bg-white text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-base"
-                  />
-                </div>
-                <div className="flex gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsEditingDetails(false)}
-                    className="flex-1 px-4 py-2 text-slate-900 bg-slate-100 border border-slate-300 rounded-lg hover:bg-slate-200 font-medium"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
-                  >
-                    Salvar
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
       </div>
     </MainLayout>
   );
