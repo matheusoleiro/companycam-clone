@@ -225,7 +225,7 @@ export default function ProjectDetailPage() {
           }
 
           const arrayBuffer = await response.arrayBuffer();
-          const fileName = `${photo.name || `photo-${i + 1}`}.jpg`;
+          const fileName = `photo-${i + 1}.jpg`;
           zip.file(fileName, arrayBuffer);
         } catch (photoErr) {
           console.warn(`Error downloading photo ${i + 1}:`, photoErr);
