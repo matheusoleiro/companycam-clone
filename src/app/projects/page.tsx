@@ -10,7 +10,7 @@ import { Plus, Calendar, MapPin, Users, Trash2 } from 'lucide-react';
 
 export default function ProjectsPage() {
   const router = useRouter();
-  const { projects, isLoadingProjects, loadProjects, selectProject, deleteProject } = useApp();
+  const { projects, isLoadingProjects, loadProjects, selectProject, deleteProject, clearCurrentProject } = useApp();
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
   const [newProjectAddress, setNewProjectAddress] = useState('');
@@ -18,6 +18,7 @@ export default function ProjectsPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
+    clearCurrentProject();
     loadProjects();
   }, []);
 

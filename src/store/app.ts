@@ -15,6 +15,7 @@ interface AppState {
   isLoadingProjects: boolean;
   loadProjects: () => Promise<void>;
   selectProject: (id: string) => Promise<void>;
+  clearCurrentProject: () => void;
   createProject: (name: string, address?: string) => Promise<Project>;
   updateProject: (id: string, name: string, address?: string) => Promise<void>;
   deleteProject: (id: string) => Promise<void>;
@@ -97,6 +98,9 @@ export const useApp = create<AppState>((set, get) => ({
       set({ currentProject: project });
       await get().loadPhotos(id);
     }
+  },
+  clearCurrentProject: () => {
+    set({ currentProject: null, photos: [] });
   },
   createProject: async (name, address) => {
     const response = await fetch('/api/projects', {
