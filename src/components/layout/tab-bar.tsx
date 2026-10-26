@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import { useApp } from '@/store/app';
-import { FolderOpen, Zap, MessageCircle, Users, Settings } from 'lucide-react';
+import { FolderOpen, Settings } from 'lucide-react';
 
 export function TabBar() {
   const router = useRouter();
@@ -11,9 +11,6 @@ export function TabBar() {
 
   const tabs = [
     { id: 'projects', label: 'Projects', icon: FolderOpen, href: '/projects' },
-    { id: 'feed', label: 'Feed', icon: Zap, href: '/feed' },
-    { id: 'chat', label: 'Chat', icon: MessageCircle, href: '/chat' },
-    { id: 'team', label: 'Team', icon: Users, href: '/team' },
     { id: 'settings', label: 'Settings', icon: Settings, href: '/settings' },
   ] as const;
 
