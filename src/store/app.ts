@@ -26,6 +26,7 @@ interface AppState {
   selectedPhotos: Set<string>;
   loadPhotos: (projectId: string) => Promise<void>;
   uploadPhoto: (projectId: string, file: File, location?: { latitude?: number; longitude?: number }) => Promise<Photo>;
+  updatePhoto: (id: string, name: string) => Promise<void>;
   deletePhoto: (id: string) => Promise<void>;
   selectPhoto: (id: string, selected: boolean) => void;
   clearSelectedPhotos: () => void;
@@ -184,6 +185,18 @@ export const useApp = create<AppState>((set, get) => ({
         : null,
     }));
     return photo;
+  },
+  updatePhoto: async (id, name) => {
+    const response = await fetch(`/api/photos?id=${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error);
+    set(state => ({
+      photos: state.photos.map(p => p.id === id ? data.photo : p),
+    }));
   },
   deletePhoto: async (id) => {
     const response = await fetch(`/api/photos?id=${id}`, {

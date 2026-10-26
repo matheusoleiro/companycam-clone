@@ -149,6 +149,65 @@ export async function POST(request: NextRequest) {
   }
 }
 
+export async function PATCH(request: NextRequest) {
+  try {
+    const supabase = await createServerSupabaseClient();
+
+    const { data: { user } } = await supabase.auth.getUser();
+
+    const photoId = request.nextUrl.searchParams.get('id');
+    if (!photoId) {
+      return NextResponse.json(
+        { error: 'Photo ID is required' },
+        { status: 400 }
+      );
+    }
+
+    const body = await request.json();
+    const { name } = body;
+
+    if (!name) {
+      return NextResponse.json(
+        { error: 'name is required' },
+        { status: 400 }
+      );
+    }
+
+    // Update photo
+    const { data: photo, error } = await supabase
+      .from('photos')
+      .update({ name })
+      .eq('id', photoId)
+      .select()
+      .single();
+
+    if (error) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 400 }
+      );
+    }
+
+    // Get public URL
+    const { data: publicUrlData } = supabase.storage
+      .from('photos')
+      .getPublicUrl(photo.storage_path);
+
+    return NextResponse.json({
+      photo: {
+        ...photo,
+        public_url: publicUrlData.publicUrl,
+      },
+    });
+  } catch (error: any) {
+    console.error('Update photo error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function DELETE(request: NextRequest) {
   try {
     const supabase = await createServerSupabaseClient();
