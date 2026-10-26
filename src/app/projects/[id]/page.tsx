@@ -41,24 +41,62 @@ export default function ProjectDetailPage() {
 
     setIsUploading(true);
     try {
-      // Get geolocation
       let latitude: number | undefined;
       let longitude: number | undefined;
 
-      if ('geolocation' in navigator) {
-        try {
-          const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject, {
-              timeout: 5000,
-              enableHighAccuracy: true,
+      // Try to extract EXIF geolocation from photo metadata
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const piexif = (await import('piexifjs')).default;
+        const exifDict = piexif.load(arrayBuffer);
+
+        if (exifDict.GPS) {
+          const gps = exifDict.GPS;
+          // GPS format: [(degrees, 1), (minutes, 1), (seconds, 1)]
+          const latitudeRef = exifDict.GPS[piexif.GPSIFD.GPSLatitudeRef]?.[0];
+          const latArray = exifDict.GPS[piexif.GPSIFD.GPSLatitude];
+          const longitudeRef = exifDict.GPS[piexif.GPSIFD.GPSLongitudeRef]?.[0];
+          const lonArray = exifDict.GPS[piexif.GPSIFD.GPSLongitude];
+
+          if (latArray && lonArray) {
+            // Convert from degrees/minutes/seconds to decimal
+            const dmsToDecimal = (dms: any[]) => {
+              const degrees = dms[0][0] / dms[0][1];
+              const minutes = dms[1][0] / dms[1][1];
+              const seconds = dms[2][0] / dms[2][1];
+              return degrees + minutes / 60 + seconds / 3600;
+            };
+
+            latitude = dmsToDecimal(latArray);
+            longitude = dmsToDecimal(lonArray);
+
+            // Apply reference direction
+            if (latitudeRef === 'S') latitude *= -1;
+            if (longitudeRef === 'W') longitude *= -1;
+
+            console.log(`📸 Localização do EXIF: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
+          }
+        }
+      } catch (exifErr) {
+        console.warn('Erro ao ler EXIF:', exifErr);
+      }
+
+      // Fallback: get device geolocation if EXIF not available
+      if (!latitude || !longitude) {
+        if ('geolocation' in navigator) {
+          try {
+            const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+              navigator.geolocation.getCurrentPosition(resolve, reject, {
+                timeout: 5000,
+                enableHighAccuracy: true,
+              });
             });
-          });
-          latitude = position.coords.latitude;
-          longitude = position.coords.longitude;
-          console.log(`📍 Localização capturada: ${latitude}, ${longitude}`);
-        } catch (geoErr) {
-          console.warn('Geolocation não disponível ou usuário recusou:', geoErr);
-          // Continue sem localização
+            latitude = position.coords.latitude;
+            longitude = position.coords.longitude;
+            console.log(`📍 Localização do dispositivo: ${latitude}, ${longitude}`);
+          } catch (geoErr) {
+            console.warn('Geolocation não disponível:', geoErr);
+          }
         }
       }
 
