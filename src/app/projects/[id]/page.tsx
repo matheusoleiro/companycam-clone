@@ -210,6 +210,10 @@ export default function ProjectDetailPage() {
       // Add each photo to the ZIP
       for (let i = 0; i < sortedPhotos.length; i++) {
         const photo = sortedPhotos[i];
+        if (!photo.public_url) {
+          console.warn(`Photo ${i + 1} has no public_url`);
+          continue;
+        }
         try {
           const response = await fetch(photo.public_url, {
             method: 'GET',
