@@ -12,6 +12,7 @@ export default function ProjectDetailPage() {
   const projectId = params.id as string;
   const { currentProject, photos, isLoadingPhotos, loadPhotos, uploadPhoto, updatePhoto, deletePhoto, selectProject, updateProject } = useApp();
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<{ completed: number; total: number } | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'timeline'>('grid');
   const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -42,18 +43,35 @@ export default function ProjectDetailPage() {
   }, [projectId]);
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.currentTarget.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.currentTarget.files || []);
+    if (files.length === 0) return;
 
     setIsUploading(true);
+    setUploadProgress({ completed: 0, total: files.length });
+
     try {
-      await uploadPhoto(projectId, file, {});
+      // Upload all files in parallel (5 at a time to avoid overwhelming server)
+      const batchSize = 5;
+      for (let i = 0; i < files.length; i += batchSize) {
+        const batch = files.slice(i, i + batchSize);
+        await Promise.all(
+          batch.map(async (file) => {
+            await uploadPhoto(projectId, file, {});
+            setUploadProgress(prev =>
+              prev ? { ...prev, completed: prev.completed + 1 } : null
+            );
+          })
+        );
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(null);
       // Reset input
       if (e.currentTarget) {
         e.currentTarget.value = '';
       }
-    } finally {
-      setIsUploading(false);
     }
   };
 
@@ -191,6 +209,7 @@ export default function ProjectDetailPage() {
             type="file"
             accept="image/*,video/*"
             onChange={handlePhotoUpload}
+            multiple
             style={{ display: 'none' }}
           />
           <button
@@ -199,7 +218,13 @@ export default function ProjectDetailPage() {
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 gap-2 flex items-center"
           >
             <Plus className="w-5 h-5" />
-            {isUploading ? 'Uploading...' : 'Add Photo'}
+            {isUploading ? (
+              <>
+                Uploading {uploadProgress?.completed}/{uploadProgress?.total}...
+              </>
+            ) : (
+              'Add Photos'
+            )}
           </button>
         </div>
 
@@ -218,6 +243,7 @@ export default function ProjectDetailPage() {
               type="file"
               accept="image/*,video/*"
               onChange={handlePhotoUpload}
+              multiple
               style={{ display: 'none' }}
             />
             <button
@@ -225,7 +251,7 @@ export default function ProjectDetailPage() {
               disabled={isUploading}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
-              Add Photo
+              {isUploading ? `Adding Photos ${uploadProgress?.completed}/${uploadProgress?.total}...` : 'Add Photos'}
             </button>
           </div>
         ) : viewMode === 'grid' ? (
