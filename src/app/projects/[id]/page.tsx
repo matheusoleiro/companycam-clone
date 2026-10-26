@@ -42,6 +42,60 @@ export default function ProjectDetailPage() {
     }
   }, [projectId]);
 
+  const compressImage = async (file: File): Promise<File> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let { width, height } = img;
+
+          // Limit max dimension to 2048px (medium quality iPhone)
+          const maxDim = 2048;
+          if (width > height) {
+            if (width > maxDim) {
+              height = (height * maxDim) / width;
+              width = maxDim;
+            }
+          } else {
+            if (height > maxDim) {
+              width = (width * maxDim) / height;
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+          }
+
+          // Convert to JPEG with 75% quality (medium)
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                const compressedFile = new File([blob], `${file.name.split('.')[0]}.jpg`, {
+                  type: 'image/jpeg',
+                  lastModified: file.lastModified,
+                });
+                resolve(compressedFile);
+              } else {
+                resolve(file);
+              }
+            },
+            'image/jpeg',
+            0.75
+          );
+        };
+        img.src = event.target?.result as string;
+      };
+    });
+  };
+
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.currentTarget.files || []);
     if (files.length === 0) return;
@@ -50,10 +104,15 @@ export default function ProjectDetailPage() {
     setUploadProgress({ completed: 0, total: files.length });
 
     try {
+      // Compress all files first
+      const compressedFiles = await Promise.all(
+        files.map(file => compressImage(file))
+      );
+
       // Upload all files in parallel (5 at a time to avoid overwhelming server)
       const batchSize = 5;
-      for (let i = 0; i < files.length; i += batchSize) {
-        const batch = files.slice(i, i + batchSize);
+      for (let i = 0; i < compressedFiles.length; i += batchSize) {
+        const batch = compressedFiles.slice(i, i + batchSize);
         await Promise.all(
           batch.map(async (file) => {
             await uploadPhoto(projectId, file, {});
