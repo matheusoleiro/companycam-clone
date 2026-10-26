@@ -119,7 +119,6 @@ export async function uploadPhoto(projectId: string, file: File, metadata: Parti
   const project = appState.projects.find(p => p.id === projectId);
   if (project) {
     project.photo_count += 1;
-    project.total_storage_used += file.size;
     project.updated_at = new Date().toISOString();
   }
 
@@ -137,7 +136,6 @@ export async function deletePhoto(id: string): Promise<void> {
   const project = appState.projects.find(p => p.id === photo.project_id);
   if (project) {
     project.photo_count -= 1;
-    project.total_storage_used -= photo.file_size;
     project.updated_at = new Date().toISOString();
   }
 
