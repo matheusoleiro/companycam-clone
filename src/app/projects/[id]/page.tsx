@@ -22,10 +22,13 @@ export default function ProjectDetailPage() {
     if (projectId) {
       const loadData = async () => {
         try {
+          console.log('Loading project:', projectId);
+          console.log('Current project before select:', currentProject);
           // Se não tiver currentProject, carrega os projetos primeiro
           if (!currentProject) {
             await selectProject(projectId);
           }
+          console.log('Current project after select:', currentProject);
           await loadPhotos(projectId);
         } catch (err) {
           console.error('Failed to load data:', err);

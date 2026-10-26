@@ -8,6 +8,7 @@ export function Header() {
   const router = useRouter();
   const { currentProject, user } = useApp();
 
+  console.log('Header - currentProject:', currentProject);
   const title = currentProject ? currentProject.name : 'CompanyCam';
 
   return (
