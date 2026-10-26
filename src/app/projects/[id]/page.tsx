@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { useApp } from '@/store/app';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/primitives/button';
-import { Plus, Loader, X, Trash2, Edit2, MapPin } from 'lucide-react';
+import { Plus, Loader, X, Trash2, Edit2 } from 'lucide-react';
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -41,66 +41,7 @@ export default function ProjectDetailPage() {
 
     setIsUploading(true);
     try {
-      let latitude: number | undefined;
-      let longitude: number | undefined;
-
-      // Try to extract EXIF geolocation from photo metadata
-      try {
-        const arrayBuffer = await file.arrayBuffer();
-        const piexif = (await import('piexifjs')).default;
-        const exifDict = piexif.load(arrayBuffer);
-
-        if (exifDict.GPS) {
-          const gps = exifDict.GPS;
-          // GPS format: [(degrees, 1), (minutes, 1), (seconds, 1)]
-          const latitudeRef = exifDict.GPS[piexif.GPSIFD.GPSLatitudeRef]?.[0];
-          const latArray = exifDict.GPS[piexif.GPSIFD.GPSLatitude];
-          const longitudeRef = exifDict.GPS[piexif.GPSIFD.GPSLongitudeRef]?.[0];
-          const lonArray = exifDict.GPS[piexif.GPSIFD.GPSLongitude];
-
-          if (latArray && lonArray) {
-            // Convert from degrees/minutes/seconds to decimal
-            const dmsToDecimal = (dms: any[]) => {
-              const degrees = dms[0][0] / dms[0][1];
-              const minutes = dms[1][0] / dms[1][1];
-              const seconds = dms[2][0] / dms[2][1];
-              return degrees + minutes / 60 + seconds / 3600;
-            };
-
-            latitude = dmsToDecimal(latArray);
-            longitude = dmsToDecimal(lonArray);
-
-            // Apply reference direction
-            if (latitudeRef === 'S') latitude *= -1;
-            if (longitudeRef === 'W') longitude *= -1;
-
-            console.log(`📸 Localização do EXIF: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`);
-          }
-        }
-      } catch (exifErr) {
-        console.warn('Erro ao ler EXIF:', exifErr);
-      }
-
-      // Fallback: get device geolocation if EXIF not available
-      if (!latitude || !longitude) {
-        if ('geolocation' in navigator) {
-          try {
-            const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-              navigator.geolocation.getCurrentPosition(resolve, reject, {
-                timeout: 5000,
-                enableHighAccuracy: true,
-              });
-            });
-            latitude = position.coords.latitude;
-            longitude = position.coords.longitude;
-            console.log(`📍 Localização do dispositivo: ${latitude}, ${longitude}`);
-          } catch (geoErr) {
-            console.warn('Geolocation não disponível:', geoErr);
-          }
-        }
-      }
-
-      await uploadPhoto(projectId, file, { latitude, longitude });
+      await uploadPhoto(projectId, file, {});
       // Reset input
       if (e.currentTarget) {
         e.currentTarget.value = '';
@@ -297,14 +238,6 @@ export default function ProjectDetailPage() {
                   <p className="text-xs text-slate-600 mt-1">
                     {(photo.file_size / 1024 / 1024).toFixed(2)} MB
                   </p>
-                  {photo.latitude && photo.longitude && (
-                    <div className="flex items-center gap-1 mt-2 text-xs text-slate-600">
-                      <MapPin className="w-3 h-3" />
-                      <span>
-                        {photo.latitude.toFixed(4)}, {photo.longitude.toFixed(4)}
-                      </span>
-                    </div>
-                  )}
                   {photo.is_pending_upload && (
                     <p className="text-xs text-amber-600 mt-1">Pending sync</p>
                   )}

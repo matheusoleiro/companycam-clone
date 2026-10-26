@@ -20,7 +20,6 @@
     "date-fns": "^2.30.0",
     "lucide-react": "^0.294.0",
     "next": "^14.0.0",
-    "piexifjs": "^1.0.6",
     "postcss": "^8.4.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
