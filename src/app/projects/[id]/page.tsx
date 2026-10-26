@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { useApp } from '@/store/app';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/primitives/button';
-import { Plus, Loader, X, Trash2, Edit2 } from 'lucide-react';
+import { Plus, Loader, X, Trash2, Edit2, Download } from 'lucide-react';
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -113,6 +113,48 @@ export default function ProjectDetailPage() {
     }
   };
 
+  const downloadPhoto = (photo: any) => {
+    const link = document.createElement('a');
+    link.href = photo.public_url;
+    link.download = photo.name || `photo-${photo.id}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const downloadAllPhotos = async () => {
+    if (sortedPhotos.length === 0) return;
+
+    try {
+      setIsUploading(true);
+      const JSZip = (await import('jszip')).default;
+      const zip = new JSZip();
+
+      // Add each photo to the ZIP
+      for (let i = 0; i < sortedPhotos.length; i++) {
+        const photo = sortedPhotos[i];
+        const response = await fetch(photo.public_url);
+        const blob = await response.blob();
+        const fileName = photo.name || `photo-${i + 1}`;
+        zip.file(fileName, blob);
+      }
+
+      // Generate ZIP and download
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(zipBlob);
+      link.download = `${currentProject?.name || 'photos'}-${new Date().toISOString().split('T')[0]}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    } catch (err) {
+      console.error('Error downloading photos:', err);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   // Sort photos based on selected order
   const sortedPhotos = [...photos].sort((a, b) => {
     const dateA = new Date(a.captured_at).getTime();
@@ -202,6 +244,17 @@ export default function ProjectDetailPage() {
               <option value="newest">Mais recentes</option>
               <option value="oldest">Mais antigas</option>
             </select>
+            {sortedPhotos.length > 0 && (
+              <button
+                onClick={downloadAllPhotos}
+                disabled={isUploading}
+                className="px-3 py-2 rounded-md text-sm font-medium bg-green-100 text-green-700 hover:bg-green-200 border border-green-300 disabled:opacity-50 flex items-center gap-2"
+                title="Baixar todas as fotos em ZIP"
+              >
+                <Download className="w-4 h-4" />
+                Baixar Tudo
+              </button>
+            )}
           </div>
 
           <input
@@ -321,6 +374,13 @@ export default function ProjectDetailPage() {
           <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
             <div className="relative max-w-4xl w-full max-h-[90vh] flex flex-col">
               <div className="absolute -top-10 right-0 flex gap-2">
+                <button
+                  onClick={() => downloadPhoto(selectedPhoto)}
+                  className="p-2 text-green-400 hover:text-green-300"
+                  title="Baixar foto"
+                >
+                  <Download className="w-6 h-6" />
+                </button>
                 <button
                   onClick={() => {
                     setEditingPhotoId(selectedPhoto.id);
