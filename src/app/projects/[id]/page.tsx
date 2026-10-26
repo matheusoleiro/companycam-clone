@@ -24,6 +24,9 @@ export default function ProjectDetailPage() {
   const [isEditingPhotoName, setIsEditingPhotoName] = useState(false);
   const [editingPhotoId, setEditingPhotoId] = useState<string | null>(null);
   const [editingPhotoName, setEditingPhotoName] = useState('');
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [showQualityMenu, setShowQualityMenu] = useState(false);
+  const [selectedQuality, setSelectedQuality] = useState<'high' | 'medium' | 'low'>('medium');
 
   useEffect(() => {
     if (projectId) {
@@ -42,7 +45,7 @@ export default function ProjectDetailPage() {
     }
   }, [projectId]);
 
-  const compressImage = async (file: File): Promise<File> => {
+  const compressImage = async (file: File, quality: number): Promise<File> => {
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -52,8 +55,12 @@ export default function ProjectDetailPage() {
           const canvas = document.createElement('canvas');
           let { width, height } = img;
 
-          // Limit max dimension to 2048px (medium quality iPhone)
-          const maxDim = 2048;
+          // Limit max dimension based on quality
+          let maxDim = 4096;
+          if (quality === 0.5) maxDim = 1024; // low
+          else if (quality === 0.75) maxDim = 2048; // medium
+          // high = 4096
+
           if (width > height) {
             if (width > maxDim) {
               height = (height * maxDim) / width;
@@ -74,7 +81,6 @@ export default function ProjectDetailPage() {
             ctx.drawImage(img, 0, 0, width, height);
           }
 
-          // Convert to JPEG with 75% quality (medium)
           canvas.toBlob(
             (blob) => {
               if (blob) {
@@ -88,7 +94,7 @@ export default function ProjectDetailPage() {
               }
             },
             'image/jpeg',
-            0.75
+            quality
           );
         };
         img.src = event.target?.result as string;
@@ -100,13 +106,28 @@ export default function ProjectDetailPage() {
     const files = Array.from(e.currentTarget.files || []);
     if (files.length === 0) return;
 
+    // Show quality menu instead of uploading immediately
+    setPendingFiles(files);
+    setShowQualityMenu(true);
+  };
+
+  const handleConfirmUpload = async () => {
+    if (pendingFiles.length === 0) return;
+
+    setShowQualityMenu(false);
     setIsUploading(true);
-    setUploadProgress({ completed: 0, total: files.length });
+    setUploadProgress({ completed: 0, total: pendingFiles.length });
 
     try {
-      // Compress all files first
+      const qualityMap = {
+        high: 1.0,
+        medium: 0.75,
+        low: 0.5,
+      };
+
+      // Compress all files
       const compressedFiles = await Promise.all(
-        files.map(file => compressImage(file))
+        pendingFiles.map(file => compressImage(file, qualityMap[selectedQuality]))
       );
 
       // Upload all files in parallel (5 at a time to avoid overwhelming server)
@@ -122,15 +143,13 @@ export default function ProjectDetailPage() {
           })
         );
       }
+
+      setPendingFiles([]);
     } catch (err) {
       console.error('Upload error:', err);
     } finally {
       setIsUploading(false);
       setUploadProgress(null);
-      // Reset input
-      if (e.currentTarget) {
-        e.currentTarget.value = '';
-      }
     }
   };
 
@@ -492,6 +511,75 @@ export default function ProjectDetailPage() {
                 <p className="text-sm text-gray-300 mt-1">
                   {(selectedPhoto.file_size / 1024 / 1024).toFixed(2)} MB
                 </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Quality Selection Modal */}
+        {showQualityMenu && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+              <h2 className="text-xl font-bold text-slate-900 mb-4">Escolher Qualidade</h2>
+              <p className="text-sm text-slate-600 mb-6">
+                Selecionou {pendingFiles.length} foto{pendingFiles.length > 1 ? 's' : ''}
+              </p>
+
+              <div className="space-y-3 mb-6">
+                <button
+                  onClick={() => setSelectedQuality('high')}
+                  className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+                    selectedQuality === 'high'
+                      ? 'border-blue-600 bg-blue-50'
+                      : 'border-slate-300 hover:border-slate-400'
+                  }`}
+                >
+                  <div className="font-semibold text-slate-900">🖼️ Qualidade Alta</div>
+                  <div className="text-xs text-slate-600">Máx 4096px • Sem compressão</div>
+                </button>
+
+                <button
+                  onClick={() => setSelectedQuality('medium')}
+                  className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+                    selectedQuality === 'medium'
+                      ? 'border-blue-600 bg-blue-50'
+                      : 'border-slate-300 hover:border-slate-400'
+                  }`}
+                >
+                  <div className="font-semibold text-slate-900">📱 Qualidade Média</div>
+                  <div className="text-xs text-slate-600">Máx 2048px • 75% qualidade</div>
+                </button>
+
+                <button
+                  onClick={() => setSelectedQuality('low')}
+                  className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+                    selectedQuality === 'low'
+                      ? 'border-blue-600 bg-blue-50'
+                      : 'border-slate-300 hover:border-slate-400'
+                  }`}
+                >
+                  <div className="font-semibold text-slate-900">⚡ Qualidade Baixa</div>
+                  <div className="text-xs text-slate-600">Máx 1024px • 50% qualidade</div>
+                </button>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowQualityMenu(false);
+                    setPendingFiles([]);
+                  }}
+                  className="flex-1 px-4 py-2 text-slate-900 bg-slate-100 border border-slate-300 rounded-lg hover:bg-slate-200 font-medium"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleConfirmUpload}
+                  disabled={isUploading}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
+                >
+                  {isUploading ? 'Enviando...' : 'Enviar'}
+                </button>
               </div>
             </div>
           </div>
