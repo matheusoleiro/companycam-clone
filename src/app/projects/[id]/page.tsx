@@ -133,10 +133,22 @@ export default function ProjectDetailPage() {
       // Add each photo to the ZIP
       for (let i = 0; i < sortedPhotos.length; i++) {
         const photo = sortedPhotos[i];
-        const response = await fetch(photo.public_url);
-        const blob = await response.blob();
-        const fileName = photo.name || `photo-${i + 1}`;
-        zip.file(fileName, blob);
+        try {
+          const response = await fetch(photo.public_url, {
+            method: 'GET',
+          });
+
+          if (!response.ok) {
+            console.warn(`Failed to fetch photo ${i + 1}`);
+            continue;
+          }
+
+          const arrayBuffer = await response.arrayBuffer();
+          const fileName = `${photo.name || `photo-${i + 1}`}.jpg`;
+          zip.file(fileName, arrayBuffer);
+        } catch (photoErr) {
+          console.warn(`Error downloading photo ${i + 1}:`, photoErr);
+        }
       }
 
       // Generate ZIP and download
@@ -150,6 +162,7 @@ export default function ProjectDetailPage() {
       URL.revokeObjectURL(link.href);
     } catch (err) {
       console.error('Error downloading photos:', err);
+      alert('Erro ao baixar fotos. Tente novamente.');
     } finally {
       setIsUploading(false);
     }
