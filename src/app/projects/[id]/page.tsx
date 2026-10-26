@@ -518,65 +518,65 @@ export default function ProjectDetailPage() {
 
         {/* Quality Selection Modal */}
         {showQualityMenu && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-              <h2 className="text-xl font-bold text-slate-900 mb-4">Escolher Qualidade</h2>
-              <p className="text-sm text-slate-600 mb-6">
+          <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-t-2xl sm:rounded-lg shadow-xl w-full sm:max-w-md p-6 sm:p-8">
+              <h2 className="text-2xl sm:text-xl font-bold text-slate-900 mb-2">Escolher Qualidade</h2>
+              <p className="text-base text-slate-600 mb-8">
                 Selecionou {pendingFiles.length} foto{pendingFiles.length > 1 ? 's' : ''}
               </p>
 
-              <div className="space-y-3 mb-6">
+              <div className="space-y-4 mb-8">
                 <button
                   onClick={() => setSelectedQuality('high')}
-                  className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+                  className={`w-full p-5 rounded-lg border-2 text-left transition-all ${
                     selectedQuality === 'high'
                       ? 'border-blue-600 bg-blue-50'
                       : 'border-slate-300 hover:border-slate-400'
                   }`}
                 >
-                  <div className="font-semibold text-slate-900">🖼️ Qualidade Alta</div>
-                  <div className="text-xs text-slate-600">Máx 4096px • Sem compressão</div>
+                  <div className="font-bold text-lg text-slate-900">🖼️ Qualidade Alta</div>
+                  <div className="text-sm text-slate-600 mt-1">Máx 4096px • Sem compressão</div>
                 </button>
 
                 <button
                   onClick={() => setSelectedQuality('medium')}
-                  className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+                  className={`w-full p-5 rounded-lg border-2 text-left transition-all ${
                     selectedQuality === 'medium'
                       ? 'border-blue-600 bg-blue-50'
                       : 'border-slate-300 hover:border-slate-400'
                   }`}
                 >
-                  <div className="font-semibold text-slate-900">📱 Qualidade Média</div>
-                  <div className="text-xs text-slate-600">Máx 2048px • 75% qualidade</div>
+                  <div className="font-bold text-lg text-slate-900">📱 Qualidade Média</div>
+                  <div className="text-sm text-slate-600 mt-1">Máx 2048px • 75% qualidade</div>
                 </button>
 
                 <button
                   onClick={() => setSelectedQuality('low')}
-                  className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+                  className={`w-full p-5 rounded-lg border-2 text-left transition-all ${
                     selectedQuality === 'low'
                       ? 'border-blue-600 bg-blue-50'
                       : 'border-slate-300 hover:border-slate-400'
                   }`}
                 >
-                  <div className="font-semibold text-slate-900">⚡ Qualidade Baixa</div>
-                  <div className="text-xs text-slate-600">Máx 1024px • 50% qualidade</div>
+                  <div className="font-bold text-lg text-slate-900">⚡ Qualidade Baixa</div>
+                  <div className="text-sm text-slate-600 mt-1">Máx 1024px • 50% qualidade</div>
                 </button>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-3 flex-col-reverse sm:flex-row">
                 <button
                   onClick={() => {
                     setShowQualityMenu(false);
                     setPendingFiles([]);
                   }}
-                  className="flex-1 px-4 py-2 text-slate-900 bg-slate-100 border border-slate-300 rounded-lg hover:bg-slate-200 font-medium"
+                  className="flex-1 px-4 py-3 sm:py-2 text-slate-900 bg-slate-100 border border-slate-300 rounded-lg hover:bg-slate-200 font-semibold text-base sm:text-sm"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={handleConfirmUpload}
                   disabled={isUploading}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
+                  className="flex-1 px-4 py-3 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-base sm:text-sm disabled:opacity-50"
                 >
                   {isUploading ? 'Enviando...' : 'Enviar'}
                 </button>
