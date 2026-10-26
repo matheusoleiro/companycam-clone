@@ -26,7 +26,9 @@ export default function ProjectDetailPage() {
   const [editingPhotoName, setEditingPhotoName] = useState('');
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [showQualityMenu, setShowQualityMenu] = useState(false);
-  const [selectedQuality, setSelectedQuality] = useState<'high' | 'medium' | 'low'>('medium');
+  const [selectedSize, setSelectedSize] = useState<'full' | 'large' | 'medium' | 'small'>('medium');
+  const [selectedFormat, setSelectedFormat] = useState<'automatic' | 'current' | 'compatible'>('compatible');
+  const [estimatedSize, setEstimatedSize] = useState(0);
 
   useEffect(() => {
     if (projectId) {
@@ -45,7 +47,22 @@ export default function ProjectDetailPage() {
     }
   }, [projectId]);
 
-  const compressImage = async (file: File, quality: number): Promise<File> => {
+  const getQualitySettings = (size: string): { maxDim: number; quality: number } => {
+    switch (size) {
+      case 'full':
+        return { maxDim: 4096, quality: 1.0 };
+      case 'large':
+        return { maxDim: 2560, quality: 0.9 };
+      case 'medium':
+        return { maxDim: 2048, quality: 0.75 };
+      case 'small':
+        return { maxDim: 1024, quality: 0.6 };
+      default:
+        return { maxDim: 2048, quality: 0.75 };
+    }
+  };
+
+  const compressImage = async (file: File, size: string, format: string): Promise<File> => {
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -54,12 +71,7 @@ export default function ProjectDetailPage() {
         img.onload = () => {
           const canvas = document.createElement('canvas');
           let { width, height } = img;
-
-          // Limit max dimension based on quality
-          let maxDim = 4096;
-          if (quality === 0.5) maxDim = 1024; // low
-          else if (quality === 0.75) maxDim = 2048; // medium
-          // high = 4096
+          const { maxDim, quality } = getQualitySettings(size);
 
           if (width > height) {
             if (width > maxDim) {
@@ -102,12 +114,17 @@ export default function ProjectDetailPage() {
     });
   };
 
+  const calculateEstimatedSize = (fileCount: number) => {
+    const avgSize = selectedSize === 'full' ? 2.5 : selectedSize === 'large' ? 1.8 : selectedSize === 'medium' ? 1.2 : 0.6;
+    return (fileCount * avgSize).toFixed(1);
+  };
+
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.currentTarget.files || []);
     if (files.length === 0) return;
 
-    // Show quality menu instead of uploading immediately
     setPendingFiles(files);
+    setEstimatedSize(parseFloat(calculateEstimatedSize(files.length)));
     setShowQualityMenu(true);
   };
 
@@ -119,15 +136,9 @@ export default function ProjectDetailPage() {
     setUploadProgress({ completed: 0, total: pendingFiles.length });
 
     try {
-      const qualityMap = {
-        high: 1.0,
-        medium: 0.75,
-        low: 0.5,
-      };
-
       // Compress all files
       const compressedFiles = await Promise.all(
-        pendingFiles.map(file => compressImage(file, qualityMap[selectedQuality]))
+        pendingFiles.map(file => compressImage(file, selectedSize, selectedFormat))
       );
 
       // Upload all files in parallel (5 at a time to avoid overwhelming server)
@@ -516,53 +527,87 @@ export default function ProjectDetailPage() {
           </div>
         )}
 
-        {/* Quality Selection Modal */}
+        {/* Upload Options Modal */}
         {showQualityMenu && (
           <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-t-2xl sm:rounded-lg shadow-xl w-full sm:max-w-md p-6 sm:p-8">
-              <h2 className="text-2xl sm:text-xl font-bold text-slate-900 mb-2">Escolher Qualidade</h2>
-              <p className="text-base text-slate-600 mb-8">
-                Selecionou {pendingFiles.length} foto{pendingFiles.length > 1 ? 's' : ''}
-              </p>
-
-              <div className="space-y-4 mb-8">
+            <div className="bg-white rounded-t-2xl sm:rounded-lg shadow-xl w-full sm:max-w-md p-6 sm:p-8 max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl sm:text-xl font-bold text-slate-900">Opções</h2>
                 <button
-                  onClick={() => setSelectedQuality('high')}
-                  className={`w-full p-5 rounded-lg border-2 text-left transition-all ${
-                    selectedQuality === 'high'
-                      ? 'border-blue-600 bg-blue-50'
-                      : 'border-slate-300 hover:border-slate-400'
-                  }`}
+                  onClick={() => {
+                    setShowQualityMenu(false);
+                    setPendingFiles([]);
+                  }}
+                  className="text-2xl text-slate-400 hover:text-slate-600"
                 >
-                  <div className="font-bold text-lg text-slate-900">🖼️ Qualidade Alta</div>
-                  <div className="text-sm text-slate-600 mt-1">Máx 4096px • Sem compressão</div>
-                </button>
-
-                <button
-                  onClick={() => setSelectedQuality('medium')}
-                  className={`w-full p-5 rounded-lg border-2 text-left transition-all ${
-                    selectedQuality === 'medium'
-                      ? 'border-blue-600 bg-blue-50'
-                      : 'border-slate-300 hover:border-slate-400'
-                  }`}
-                >
-                  <div className="font-bold text-lg text-slate-900">📱 Qualidade Média</div>
-                  <div className="text-sm text-slate-600 mt-1">Máx 2048px • 75% qualidade</div>
-                </button>
-
-                <button
-                  onClick={() => setSelectedQuality('low')}
-                  className={`w-full p-5 rounded-lg border-2 text-left transition-all ${
-                    selectedQuality === 'low'
-                      ? 'border-blue-600 bg-blue-50'
-                      : 'border-slate-300 hover:border-slate-400'
-                  }`}
-                >
-                  <div className="font-bold text-lg text-slate-900">⚡ Qualidade Baixa</div>
-                  <div className="text-sm text-slate-600 mt-1">Máx 1024px • 50% qualidade</div>
+                  ✕
                 </button>
               </div>
 
+              {/* Size Section */}
+              <div className="mb-8">
+                <h3 className="text-sm font-semibold text-slate-600 uppercase mb-4">Tamanho</h3>
+                <div className="space-y-2">
+                  {[
+                    { id: 'full', label: 'Full Size', desc: 'Máx 4096px' },
+                    { id: 'large', label: 'Large', desc: 'Máx 2560px' },
+                    { id: 'medium', label: 'Medium', desc: 'Máx 2048px' },
+                    { id: 'small', label: 'Small', desc: 'Máx 1024px' },
+                  ].map((option) => (
+                    <button
+                      key={option.id}
+                      onClick={() => setSelectedSize(option.id as any)}
+                      className="w-full p-4 text-left hover:bg-slate-50 rounded-lg flex items-center justify-between"
+                    >
+                      <div>
+                        <div className="font-medium text-slate-900">{option.label}</div>
+                        <div className="text-xs text-slate-600">{option.desc}</div>
+                      </div>
+                      {selectedSize === option.id && (
+                        <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center">
+                          <span className="text-white text-sm">✓</span>
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Format Section */}
+              <div className="mb-8">
+                <h3 className="text-sm font-semibold text-slate-600 uppercase mb-4">Formato</h3>
+                <div className="space-y-2">
+                  {[
+                    { id: 'automatic', label: 'Automatic', desc: 'Formato ideal para o destino' },
+                    { id: 'current', label: 'Current', desc: 'Mantém formato original' },
+                    { id: 'compatible', label: 'Most Compatible', desc: 'JPEG (melhor compatibilidade)' },
+                  ].map((option) => (
+                    <button
+                      key={option.id}
+                      onClick={() => setSelectedFormat(option.id as any)}
+                      className="w-full p-4 text-left hover:bg-slate-50 rounded-lg flex items-center justify-between"
+                    >
+                      <div>
+                        <div className="font-medium text-slate-900">{option.label}</div>
+                        <div className="text-xs text-slate-600">{option.desc}</div>
+                      </div>
+                      {selectedFormat === option.id && (
+                        <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center">
+                          <span className="text-white text-sm">✓</span>
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Estimated Size */}
+              <div className="p-4 bg-slate-50 rounded-lg mb-8">
+                <div className="text-sm text-slate-600">Tamanho estimado</div>
+                <div className="text-xl font-semibold text-slate-900">{estimatedSize} MB</div>
+              </div>
+
+              {/* Action Buttons */}
               <div className="flex gap-3 flex-col-reverse sm:flex-row">
                 <button
                   onClick={() => {
