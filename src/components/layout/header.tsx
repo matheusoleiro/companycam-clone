@@ -13,18 +13,16 @@ export function Header() {
   return (
     <header className="sticky top-0 bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between h-14">
       {/* Left: Back or Title */}
-      <div className="flex items-center gap-2">
+      <button
+        onClick={() => router.push('/projects')}
+        className="flex items-center gap-2 hover:opacity-75 transition-opacity"
+        aria-label="Go to projects"
+      >
         {currentProject && (
-          <button
-            onClick={() => router.push('/projects')}
-            className="p-2 hover:bg-slate-100 rounded-md"
-            aria-label="Back to projects"
-          >
-            ←
-          </button>
+          <span className="p-2 hover:bg-slate-100 rounded-md">←</span>
         )}
         <h1 className="text-lg font-semibold text-slate-900 truncate">{title}</h1>
-      </div>
+      </button>
 
       {/* Right: Menu */}
       <button
