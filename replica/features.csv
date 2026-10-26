@@ -1,65 +1,65 @@
 Feature,Area,Priority,Original,Clone,Notes
-Authentication & Account,Auth,Must,yes,yes,Login/signup with email/password; demo account works; OAuth deferred
-Project Management,Core,Must,yes,yes,Create project, view all projects; archive/delete deferred
-Photo Capture,Core,Must,yes,partial,File upload works; native camera UI deferred to Phase 2
+Authentication & Account,Auth,Must,yes,partial,Client-side signup/login works; session persistence disabled for MVP; OAuth deferred
+Project Management,Core,Must,yes,yes,Create, read, update (rename), delete all working; Supabase CRUD connected
+Photo Capture,Core,Must,yes,partial,File upload + geolocation working; native camera UI deferred to Phase 2
 Photo Annotation,Core,Must,yes,no,Full annotation UI deferred to Phase 2 (pin, measure, draw, text, voice)
-Photo Gallery,Core,Must,yes,yes,Grid + timeline views; responsive layout; empty state
-Photo Timeline,Core,Should,yes,no,Chronological timeline view of project photos; date grouping; scroll to specific date
-Photo Organization,Core,Should,yes,no,Tag photos; filter by tag/crew/date; batch select and bulk operations (Sept 2026)
-Comments & Chat,Core,Must,yes,no,Photo-level comments; project chat; @mention team members; emoji reactions (Sept 2026); notifications
-Checklists,Crew+,Should,yes,no,Create checklist; reusable templates; assign to crew member; voice commands for item creation
-Checklist Tracking,Crew+,Should,yes,no,View assigned checklists; mark items complete; progress tracking; completion timestamp
-Team Management,Crew+,Must,yes,no,Add/remove team members; set roles (contractor/crew/supervisor/admin); view online status
-Clock In/Out,Crew+,Should,yes,no,Crew check-in tracking; daily hours; time display on team view (Oct 2026 redesign)
-Report Builder,Core,Should,yes,no,Select report template (before/after; progress; final); multi-select photos; add notes
-Report Templates,Should,yes,no,Pre-built templates; customizable branding (logo/colors/client header); multi-page support
-Report Generation,Core,Should,yes,no,Render photos + notes into PDF or HTML; preview before sharing
-Report Sharing,Core,Should,yes,no,Export as PDF; email to client; copy share link (guest access); embed in SMS
-Proposal Builder,Scale+,Should,yes,no,Select template; add photo + line items; calculate subtotal/tax; set deposit request
-Per-Line Item Markup,Scale+,Should,yes,no,Each line item has qty × unit_cost × (1 + markup%); per-line tax toggle (Sept 2026)
-Proposal Email,Scale+,Could,yes,no,Email proposal directly to homeowner; client views inline; can approve/reject
-Document Management,Core,Should,yes,no,Upload documents; scan via camera; organize by folder; bulk move (Sept 2026)
-Document Scanning,Core,Could,yes,no,Scan docs with device camera; OCR optional; save to project
-Offline Mode,Core+,Could,yes,no,Capture photos offline; queue for sync when online; conflict resolution
-Cloud Storage,Core,Must,yes,no,Unlimited storage (Core tier); photo/document hosting; file versioning; CDN delivery
-Real-time Sync,Crew+,Should,yes,no,Photos/checklists/chat sync in real-time; presence indicator (online/offline); WebSocket or polling
-Push Notifications,Core,Should,yes,no,Chat mentions; task assignments; photo uploads from team; checklist completion
-Integrations - Zapier,Platform,Could,yes,no,9000+ app connections via Zapier; no-code automation
-Integrations - CRM,Platform,Could,yes,no,JobNimbus; JobTread; ServiceTitan; Jobber; AccuLynx; photo sync to job details
-Integrations - Accounting,Platform,Could,yes,no,QuickBooks Online; sync invoice/proposal data
-Integrations - REST API,Platform,Could,yes,no,Read/create/update projects, photos, checklists; webhook support; OAuth 2.0
-Voice Commands,Crew+,Could,yes,no,"Create checklist items, set assignees, voice annotation all via mic button + natural language"
-Voice-to-Text,Crew+,Could,yes,no,Transcribe voice notes and chat; voice search; hands-free workflow
-Auto-Translation,Scale+,Could,yes,no,Translate voice notes and chat into multiple languages; Spanish default
-LiDAR Measurement,Scale+,Could,yes,no,Measure rooms with ARKit LiDAR; floor plan export; iOS 12 Pro+ only
-Before/After Photos,Core,Should,yes,no,Compare two photos side-by-side; slider view; use in reports
-Guest Access / Sharing,Core,Should,yes,no,Share report/gallery via link; no login required; read-only guest view
-Branding & White Label,Enterprise,Could,yes,no,Custom logo; colors; domain; enterprise contracts only
-Live Photo Feed,Crew+,Could,yes,no,Real-time feed of all team photos across projects; notifications; chronological
-Mobile Responsive,Core,Must,yes,no,Full iOS app (iOS 16+); portrait/landscape; iPhone + iPad support
-Dark Mode,Core,Could,yes,no,System-wide dark theme toggle
-Offline Photo Storage,Core,Could,yes,no,Store photos locally while offline; sync to cloud when online
-App Store Integration,Core,Must,yes,no,App available on iOS App Store; auto-updates; in-app purchase for subscription
-Profile Management,Core,Should,yes,no,Edit name; profile photo; email; notification preferences; timezone
-Search,Core,Could,yes,no,Full-text search across photos (metadata), chat, documents; tag/crew filter
-Advanced Reporting,Scale+,Could,yes,no,Export reports as CSV/JSON; analytics dashboard (basic); usage stats
-Two-Factor Authentication,Core,Could,yes,no,TOTP/SMS 2FA option; Enterprise feature
-Role-Based Access Control,Crew+,Should,yes,no,Contractor (full access); crew member (limited); supervisor (team + reports); admin (all)
-Invoice Generation,Scale+,Should,yes,no,Create invoices from proposals; line items; tax; payment terms; email
-Payment Collection,Scale+,Could,yes,no,Accept deposits/payments on-site; Stripe integration; email receipts
-Deposit Requests,Scale+,Could,yes,no,Request deposit before starting job; collect on-site or via email link
-Proposal Markup,Scale+,Should,yes,no,Markup individual items or whole proposal; calculate total; tax-aware
-Project Collaboration,Crew+,Should,yes,no,Multiple crew members in same project; simultaneous photo/checklist edits; presence awareness
-File Versioning,Core,Could,yes,no,Restore previous versions of documents or project snapshots
-Subscription Management,Core,Must,yes,no,Choose tier (Core/Crew/Scale); auto-renew monthly; upgrade/downgrade; cancel
-Notifications Center,Core,Should,yes,no,Inbox-style notification log; read/unread; filter by type; dismiss
-Email Notifications,Core,Should,yes,no,Configurable digest emails; daily summary; mention alerts
-In-App Announcements,Platform,Could,yes,no,Feature updates; tips; in-app callouts for new features
-Help Center Integration,Core,Could,yes,no,Contextual help links; knowledge base access within app; support chat option
-Performance Optimization,Core,Must,yes,no,Fast photo upload; lazy loading gallery; smooth animations
-Accessibility,Core,Should,yes,no,VoiceOver support; color contrast; keyboard navigation; alt text on images
-Localization,Scale+,Could,yes,no,Multiple languages (Spanish primary); RTL support; locale-aware dates/currency
-Analytics & Reporting,Enterprise,Could,yes,no,User engagement; feature usage; adoption metrics; Admin dashboard
-API Rate Limiting,Platform,Should,yes,no,Throttle API calls; quota per subscription tier; exponential backoff
-Data Privacy,Core,Must,yes,no,GDPR/CCPA compliance; data export; account deletion; encryption in transit & at rest
-Terms & Legal,Core,Must,yes,no,ToS; privacy policy; acceptable use policy; liability limits
+Photo Gallery,Core,Must,yes,yes,Grid + timeline views; responsive layout; empty states; modal view
+Photo Timeline,Core,Should,yes,yes,Chronological timeline view with date/metadata; scroll to photo
+Photo Organization,Core,Should,yes,no,Tag photos; filter by tag/crew/date; batch select deferred to v2
+Comments & Chat,Core,Must,yes,skip,Moved to backlog (v3+); not MVP priority
+Checklists,Crew+,Should,yes,skip,Moved to backlog; not MVP priority
+Checklist Tracking,Crew+,Should,yes,skip,Moved to backlog; not MVP priority
+Team Management,Crew+,Must,yes,no,Add/remove/roles deferred to v2; critical for multi-user
+Clock In/Out,Crew+,Should,yes,skip,Moved to backlog (v4+)
+Report Builder,Core,Should,yes,no,Select template; multi-select photos deferred to v3
+Report Templates,Should,yes,skip,Moved to backlog; not MVP
+Report Generation,Core,Should,yes,no,Render photos + notes to PDF deferred to v3
+Report Sharing,Core,Should,yes,no,Export/share deferred to v3
+Proposal Builder,Scale+,Should,yes,skip,Moved to backlog; Scale tier feature
+Per-Line Item Markup,Scale+,Should,yes,skip,Moved to backlog; Scale tier feature
+Proposal Email,Scale+,Could,yes,skip,Moved to backlog; Scale tier feature
+Document Management,Core,Should,yes,no,Upload documents deferred to v3
+Document Scanning,Core,Could,yes,skip,Moved to backlog; not MVP
+Offline Mode,Core+,Could,yes,no,Offline queue deferred to v3
+Cloud Storage,Core,Must,yes,partial,Supabase Storage working for photos; metadata in PostgreSQL
+Real-time Sync,Crew+,Should,yes,partial,Data persists across devices; real-time sync deferred to v2
+Push Notifications,Core,Should,yes,no,Deferred to v2 (requires teams + auth working)
+Integrations - Zapier,Platform,Could,yes,skip,Moved to backlog (v4+)
+Integrations - CRM,Platform,Could,yes,skip,Moved to backlog (v4+)
+Integrations - Accounting,Platform,Could,yes,skip,Moved to backlog (v4+)
+Integrations - REST API,Platform,Could,yes,partial,REST API exists (projects, photos); webhooks deferred
+Voice Commands,Crew+,Could,yes,skip,Moved to backlog (v4+)
+Voice-to-Text,Crew+,Could,yes,skip,Moved to backlog (v4+)
+Auto-Translation,Scale+,Could,yes,skip,Moved to backlog (v4+)
+LiDAR Measurement,Scale+,Could,yes,skip,Moved to backlog (v4+)
+Before/After Photos,Core,Should,yes,no,Slider view deferred to v3
+Guest Access / Sharing,Core,Should,yes,no,Share links deferred to v3
+Branding & White Label,Enterprise,Could,yes,skip,Moved to backlog (v5+)
+Live Photo Feed,Crew+,Could,yes,skip,Moved to backlog (v4+)
+Mobile Responsive,Core,Must,yes,partial,Works on mobile web; native iOS app deferred to Phase 2
+Dark Mode,Core,Could,yes,no,System theme support deferred to v3
+Offline Photo Storage,Core,Could,yes,no,Local storage queue deferred to v3
+App Store Integration,Core,Must,yes,no,Native Expo app deferred to Phase 2
+Profile Management,Core,Should,yes,no,Edit profile deferred to v2
+Search,Core,Could,yes,no,Full-text search deferred to v3
+Advanced Reporting,Scale+,Could,yes,no,CSV/JSON export deferred to v3
+Two-Factor Authentication,Core,Could,yes,no,2FA deferred to v3
+Role-Based Access Control,Crew+,Should,yes,no,Roles deferred to v2 (team management)
+Invoice Generation,Scale+,Should,yes,skip,Moved to backlog (v4+)
+Payment Collection,Scale+,Could,yes,no,Stripe integration deferred to v2
+Deposit Requests,Scale+,Could,yes,skip,Moved to backlog (v4+)
+Proposal Markup,Scale+,Should,yes,skip,Moved to backlog (v4+)
+Project Collaboration,Crew+,Should,yes,partial,Multi-user read works (RLS ready); simultaneous edits need v2
+File Versioning,Core,Could,yes,no,Version history deferred to v3
+Subscription Management,Core,Must,yes,no,Stripe plans deferred to v2
+Notifications Center,Core,Should,yes,no,Inbox deferred to v2
+Email Notifications,Core,Should,yes,no,Resend integration deferred to v2
+In-App Announcements,Platform,Could,yes,skip,Moved to backlog
+Help Center Integration,Core,Could,yes,skip,Moved to backlog
+Performance Optimization,Core,Must,yes,partial,Photos optimized; some lazy loading; smooth UI
+Accessibility,Core,Should,yes,partial,Color contrast good; keyboard nav works; alt text on images
+Localization,Scale+,Could,yes,skip,Moved to backlog (v4+)
+Analytics & Reporting,Enterprise,Could,yes,skip,Moved to backlog (v5+)
+API Rate Limiting,Platform,Should,yes,no,Rate limits deferred to v2 (auth working first)
+Data Privacy,Core,Must,yes,partial,GDPR-ready with RLS; account deletion needs v2
+Terms & Legal,Core,Must,yes,no,ToS/privacy deferred to launch phase
