@@ -10,7 +10,7 @@ const strings = getStrings('en');
 interface FolderTreeProps {
   folders: Folder[];
   selectedFolderId?: string;
-  onSelectFolder: (folderId: string | null) => void;
+  onSelectFolder: (folderId: string | undefined) => void;
   onCreateFolder: (name: string, parentFolderId?: string) => Promise<void>;
   onDeleteFolder: (id: string) => Promise<void>;
   onUpdateFolder: (id: string, name: string) => Promise<void>;
