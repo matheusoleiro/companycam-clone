@@ -22,7 +22,7 @@ export function TabBar() {
   };
 
   return (
-    <nav className="sticky bottom-0 bg-white border-t border-slate-200 px-0 py-2 flex items-center justify-around h-16">
+    <nav className="sticky bottom-0 bg-[var(--color-stone-100)] border-t border-[var(--color-border)] px-0 py-2 flex items-center justify-around h-14 flex-shrink-0">
       {tabs.map(tab => {
         const Icon = tab.icon;
         const isActive = currentTab === tab.id;
@@ -31,16 +31,16 @@ export function TabBar() {
           <button
             key={tab.id}
             onClick={() => handleTabClick(tab)}
-            className={`flex flex-col items-center gap-1 px-4 py-2 rounded-md transition-colors ${
+            className={`flex flex-col items-center gap-1 px-4 py-1 rounded transition-colors ${
               isActive
-                ? 'text-blue-600'
-                : 'text-slate-600 hover:bg-slate-100'
+                ? 'text-[var(--color-accent-main)]'
+                : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]'
             }`}
             aria-label={tab.label}
             aria-current={isActive ? 'page' : undefined}
           >
-            <Icon className="w-6 h-6" />
-            <span className="text-xs font-medium">{tab.label}</span>
+            <Icon className="w-5 h-5" />
+            <span className="text-xs font-500">{tab.label}</span>
           </button>
         );
       })}
