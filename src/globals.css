@@ -165,6 +165,7 @@
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -174,6 +175,7 @@ body {
   color: var(--color-text-primary);
   background-color: var(--color-bg);
   letter-spacing: var(--tracking-normal);
+  font-variant-numeric: tabular-nums;
 }
 
 /* ============================================
@@ -187,6 +189,7 @@ h1 {
   font-weight: 700;
   line-height: var(--line-tight);
   letter-spacing: var(--tracking-tight);
+  text-wrap: balance;
 }
 
 h2 {
@@ -195,6 +198,7 @@ h2 {
   font-weight: 700;
   line-height: var(--line-tight);
   letter-spacing: var(--tracking-tight);
+  text-wrap: balance;
 }
 
 h3 {
@@ -203,6 +207,7 @@ h3 {
   font-weight: 600;
   line-height: var(--line-snug);
   letter-spacing: var(--tracking-normal);
+  text-wrap: balance;
 }
 
 h4 {
@@ -223,6 +228,7 @@ h5, h6 {
 p {
   line-height: var(--line-relaxed);
   color: var(--color-text-secondary);
+  text-wrap: pretty;
 }
 
 small {
@@ -280,12 +286,24 @@ select:focus-visible {
   box-shadow: var(--shadow-sm);
 }
 
+/* Smooth transitions for interactive elements */
 .transition-smooth {
-  transition: all var(--duration-base) var(--ease-out);
+  transition-property: background-color, border-color, color, opacity, box-shadow;
+  transition-duration: var(--duration-base);
+  transition-timing-function: var(--ease-out);
 }
 
 .transition-fast {
-  transition: all var(--duration-fast) var(--ease-out);
+  transition-property: background-color, border-color, opacity;
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--ease-out);
+}
+
+/* Transform transitions for motion */
+.transition-transform {
+  transition-property: transform, opacity;
+  transition-duration: var(--duration-base);
+  transition-timing-function: var(--ease-out);
 }
 
 /* ============================================
@@ -324,4 +342,16 @@ select:focus {
 input::placeholder,
 textarea::placeholder {
   color: var(--color-text-muted);
+}
+
+/* Image Outlines - Subtle edge definition */
+img {
+  outline: 1px solid rgba(0, 0, 0, 0.08);
+  outline-offset: -1px;
+}
+
+@media (prefers-color-scheme: dark) {
+  img {
+    outline-color: rgba(255, 255, 255, 0.1);
+  }
 }

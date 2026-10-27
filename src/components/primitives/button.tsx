@@ -70,6 +70,10 @@ export function Button({
         font-sans font-medium rounded-[var(--radius-md)]
         focus-visible:outline-2 focus-visible:outline-offset-2
         focus-visible:outline-[var(--color-accent-main)]
+        active:scale-[0.96]
+        transition-[transform,background-color,border-color,color,opacity,box-shadow]
+        duration-[var(--duration-base)]
+        ease-out
         ${sizeClasses[size]}
         ${variantClasses[variant]}
         ${className || ''}

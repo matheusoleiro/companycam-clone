@@ -38,7 +38,9 @@ export function Input({
             text-[var(--color-text-primary)]
             text-sm font-500
             placeholder-[var(--color-text-muted)]
-            transition-smooth
+            transition-[border-color,box-shadow,background-color]
+            duration-[var(--duration-fast)]
+            ease-out
             focus:outline-none
             focus:border-[var(--color-accent-main)]
             focus:ring-3

@@ -194,14 +194,14 @@ Used for confirmatory actions (publish, complete).
 
 ---
 
-## Motion
+## Motion & Polish
 
-**Principle:** Motion enhances, never distracts.
+**Principle:** Motion enhances, never distracts. Every interaction should feel intentional.
 
 ### Timing
 ```
-fast   → 100ms  (micro interactions)
-base   → 150ms  (default transitions)
+fast   → 100ms  (micro interactions, input focus)
+base   → 150ms  (default transitions, button presses)
 slow   → 250ms  (modals, page transitions)
 slower → 400ms  (staggered reveals)
 ```
@@ -210,12 +210,25 @@ slower → 400ms  (staggered reveals)
 - **Ease Out:** Default (cubic-bezier(0, 0, 0.2, 1)) – things feel snappy
 - **Ease Out Quart:** For stronger feel (cubic-bezier(0.25, 1, 0.5, 1))
 
-### Rules
-1. Avoid animating layout properties (width, height, position—use transforms instead)
-2. Respect `prefers-reduced-motion`
-3. Use `transition-smooth` class for standard transitions
-4. Stagger reveals for list items (animation-delay per child)
-5. No bounce or elastic easing—construction tools are serious
+### Transition Rules
+1. **Never use `transition: all`** – specify properties explicitly
+2. **Button press:** `scale(0.96)` with transform transition for tactile feedback
+3. **Input focus:** Border + ring transition (fast, 100ms)
+4. **Avoid layout animations** – use transforms instead of width/height changes
+5. **Respect `prefers-reduced-motion`** – all animations disabled automatically
+6. **Hit areas:** Minimum 40px (ideally 44px for touch targets)
+
+### Specific Transitions
+- **Buttons:** `transform, background-color, border-color, color, opacity, box-shadow`
+- **Inputs:** `border-color, box-shadow, background-color`
+- **Links:** `color, text-decoration`
+
+### Polish Details
+- **Font smoothing:** `-webkit-font-smoothing: antialiased` + `-moz-osx-font-smoothing: grayscale`
+- **Tabular numbers:** `font-variant-numeric: tabular-nums` for counters and dynamic numbers
+- **Text wrapping:** `text-wrap: balance` on headings, `text-wrap: pretty` on body text
+- **Image outlines:** Subtle 1px outline (rgba dark/light) with -1px offset to define edges
+- **Smooth scrolling:** `scroll-behavior: smooth` on html element
 
 ---
 
