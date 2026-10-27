@@ -411,6 +411,12 @@ export default function ProjectDetailPage() {
                 }
               }}
               onUpdateFolder={handleUpdateFolder}
+              onDropPhotos={async (photoIds, folderId) => {
+                const updates = photoIds.map(photoId =>
+                  movePhotoToFolder(photoId, folderId)
+                );
+                await Promise.all(updates);
+              }}
             />
           )}
         </div>
@@ -655,6 +661,11 @@ export default function ProjectDetailPage() {
                       if (!isSelected) {
                         setSelectedPhotoIds(new Set([photo.id]));
                       }
+                      const idsToTransfer = isSelected
+                        ? Array.from(selectedPhotoIds)
+                        : [photo.id];
+                      e.dataTransfer!.effectAllowed = 'move';
+                      e.dataTransfer!.setData('photoIds', idsToTransfer.join(','));
                     }}
                     onDragEnd={() => {}}
                   >
@@ -716,7 +727,18 @@ export default function ProjectDetailPage() {
               return (
                 <div
                   key={photo.id}
-                  className={`w-full flex gap-4 p-4 border rounded-lg hover:shadow-md transition-all text-left ${
+                  draggable
+                  onDragStart={(e) => {
+                    if (!isSelected) {
+                      setSelectedPhotoIds(new Set([photo.id]));
+                    }
+                    const idsToTransfer = isSelected
+                      ? Array.from(selectedPhotoIds)
+                      : [photo.id];
+                    e.dataTransfer!.effectAllowed = 'move';
+                    e.dataTransfer!.setData('photoIds', idsToTransfer.join(','));
+                  }}
+                  className={`w-full flex gap-4 p-4 border rounded-lg hover:shadow-md transition-all text-left cursor-move ${
                     isSelected ? 'ring-2 ring-blue-500 border-blue-500 bg-blue-50' : 'border-slate-200 bg-slate-50'
                   }`}
                 >
@@ -845,7 +867,13 @@ export default function ProjectDetailPage() {
               <img
                 src={selectedPhoto.public_url}
                 alt="Photo"
-                className={`max-h-[${IMAGE_DISPLAY.maxPhotoViewerHeight}] w-auto object-contain rounded-lg`}
+                style={{
+                  maxHeight: `${IMAGE_DISPLAY.maxPhotoViewerHeight}`,
+                  maxWidth: '100%',
+                  width: 'auto',
+                  height: 'auto',
+                }}
+                className="object-contain rounded-lg"
               />
               <div className="text-white text-center mt-4">
                 {selectedPhoto.name && (

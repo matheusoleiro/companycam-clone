@@ -14,6 +14,7 @@ interface FolderTreeProps {
   onCreateFolder: (name: string, parentFolderId?: string) => Promise<void>;
   onDeleteFolder: (id: string) => Promise<void>;
   onUpdateFolder: (id: string, name: string) => Promise<void>;
+  onDropPhotos?: (photoIds: string[], folderId: string | undefined) => Promise<void>;
 }
 
 export function FolderTree({
@@ -23,6 +24,7 @@ export function FolderTree({
   onCreateFolder,
   onDeleteFolder,
   onUpdateFolder,
+  onDropPhotos,
 }: FolderTreeProps) {
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
   const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
@@ -30,6 +32,7 @@ export function FolderTree({
   const [isCreatingRoot, setIsCreatingRoot] = useState(false);
   const [creatingParentId, setCreatingParentId] = useState<string | null>(null);
   const [newFolderName, setNewFolderName] = useState('');
+  const [dragOverFolderId, setDragOverFolderId] = useState<string | null>(null);
 
   const toggleExpanded = (folderId: string) => {
     const newExpanded = new Set(expandedFolders);
@@ -82,8 +85,26 @@ export function FolderTree({
     return (
       <div key={folder.id} style={{ marginLeft: `${level * 16}px` }} className="group">
         <div
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors ${
-            isSelected ? 'bg-blue-100 text-blue-700' : 'text-slate-700'
+          onDragOver={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setDragOverFolderId(folder.id);
+          }}
+          onDragLeave={() => {
+            setDragOverFolderId(null);
+          }}
+          onDrop={async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const photoIds = e.dataTransfer.getData('photoIds')?.split(',') || [];
+            if (photoIds.length > 0 && onDropPhotos) {
+              await onDropPhotos(photoIds, folder.id);
+            }
+            setDragOverFolderId(null);
+          }}
+          className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+            dragOverFolderId === folder.id ? 'bg-green-200' :
+            isSelected ? 'bg-blue-100 text-blue-700' : 'hover:bg-slate-100 text-slate-700'
           }`}
         >
           {children.length > 0 && (
@@ -185,7 +206,25 @@ export function FolderTree({
         onClick={() => {
           onSelectFolder(undefined);
         }}
-        className={`text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+        onDragOver={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setDragOverFolderId(null);
+        }}
+        onDragLeave={() => {
+          setDragOverFolderId(null);
+        }}
+        onDrop={async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const photoIds = e.dataTransfer.getData('photoIds')?.split(',') || [];
+          if (photoIds.length > 0 && onDropPhotos) {
+            await onDropPhotos(photoIds, undefined);
+          }
+          setDragOverFolderId(null);
+        }}
+        className={`text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full ${
+          dragOverFolderId === null && selectedFolderId === undefined ? 'bg-blue-200' :
           selectedFolderId === undefined
             ? 'bg-blue-100 text-blue-700'
             : 'hover:bg-slate-100 text-slate-700'
