@@ -1,0 +1,25 @@
+# Supabase Configuration
+
+[api]
+enabled = true
+max_body_size = "20mb"
+
+[db]
+# Postgres settings
+port = 5432
+major_version = 15
+
+[auth]
+enabled = true
+email.enable_signup = true
+email.double_confirm_changes = true
+external.apple.enabled = false
+external.google.enabled = false
+
+[studio]
+enabled = true
+port = 3001
+
+[inbucket]
+enabled = true
+port = 54324

@@ -8,7 +8,11 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "seed": "node scripts/seed-demo-data.js"
+    "seed": "node scripts/seed-demo-data.js",
+    "db:push": "supabase db push",
+    "db:pull": "supabase db pull",
+    "db:reset": "supabase db reset",
+    "db:migration": "supabase migration new"
   },
   "dependencies": {
     "@supabase/ssr": "^0.0.10",
