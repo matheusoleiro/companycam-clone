@@ -647,15 +647,16 @@ export default function ProjectDetailPage() {
               </div>
             )}
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="w-full mx-auto grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3" style={{ maxHeight: `calc(100vh - 300px)`, overflowY: 'auto' }}>
               {sortedPhotos.map((photo) => {
                 const isSelected = selectedPhotoIds.has(photo.id);
                 return (
                   <div
                     key={photo.id}
-                    className={`relative group rounded-lg overflow-hidden cursor-grab active:cursor-grabbing transition-all ${
+                    className={`relative group rounded-lg overflow-hidden cursor-grab active:cursor-grabbing transition-all flex-shrink-0 ${
                       isSelected ? 'ring-2 ring-blue-500' : ''
                     }`}
+                    style={{ width: '140px', height: '140px' }}
                     draggable={true}
                     onDragStart={(e) => {
                       if (!isSelected) {
@@ -678,9 +679,9 @@ export default function ProjectDetailPage() {
                           setPhotoViewerOpen(true);
                         }
                       }}
-                      className="w-full block"
+                      className="w-full h-full block"
                     >
-                      <div className="bg-slate-100 aspect-square overflow-hidden">
+                      <div className="w-full h-full bg-slate-100 overflow-hidden">
                         <img
                           src={photo.public_url || `${IMAGE_DISPLAY.placeholders.grid}?text=${photo.id.substring(0, 8)}`}
                           alt={`Project photo ${photo.id}`}
