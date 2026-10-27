@@ -74,12 +74,13 @@ export function PhotoViewer({ photos, initialIndex, isOpen, onClose }: PhotoView
       </button>
 
       {/* Photo Container */}
-      <div className="flex flex-col items-center gap-4 max-w-4xl w-full">
+      <div className="flex flex-col items-center justify-center gap-4 max-w-6xl w-full h-screen" style={{ maxHeight: 'calc(100vh - 120px)' }}>
         {currentPhoto?.public_url && (
           <img
             src={currentPhoto.public_url}
             alt={`Photo ${currentIndex + 1}`}
-            className={`max-h-[${PHOTO_VIEWER.maxHeight}] w-auto object-contain rounded-lg`}
+            className="max-w-full max-h-full w-auto h-auto object-contain rounded-lg"
+            style={{ maxHeight: 'calc(100vh - 120px)' }}
           />
         )}
 
