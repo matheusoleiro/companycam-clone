@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { User, Project, Photo } from '@/types';
+import { User, Project, Photo, Folder } from '@/types';
 
 interface AppState {
   // Auth
@@ -30,6 +30,14 @@ interface AppState {
   deletePhoto: (id: string) => Promise<void>;
   selectPhoto: (id: string, selected: boolean) => void;
   clearSelectedPhotos: () => void;
+
+  // Folders
+  folders: Folder[];
+  isLoadingFolders: boolean;
+  loadFolders: (projectId: string) => Promise<void>;
+  createFolder: (projectId: string, name: string, parentFolderId?: string) => Promise<Folder>;
+  updateFolder: (id: string, name: string, parentFolderId?: string) => Promise<void>;
+  deleteFolder: (id: string) => Promise<void>;
 
   // UI State
   selectedTab: 'projects' | 'feed' | 'chat' | 'team' | 'settings';
@@ -224,6 +232,69 @@ export const useApp = create<AppState>((set, get) => ({
   },
   clearSelectedPhotos: () => {
     set({ selectedPhotos: new Set() });
+  },
+
+  // Folders
+  folders: [],
+  isLoadingFolders: false,
+  loadFolders: async (projectId: string) => {
+    set({ isLoadingFolders: true });
+    try {
+      const response = await fetch(`/api/folders?projectId=${projectId}`);
+      if (!response.ok) throw new Error('Failed to load folders');
+      const folders = await response.json();
+      set({ folders, isLoadingFolders: false });
+    } catch (error) {
+      console.error('Error loading folders:', error);
+      set({ isLoadingFolders: false });
+    }
+  },
+  createFolder: async (projectId: string, name: string, parentFolderId?: string) => {
+    try {
+      const response = await fetch('/api/folders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectId, name, parentFolderId }),
+      });
+      if (!response.ok) throw new Error('Failed to create folder');
+      const folder = await response.json();
+      set(state => ({ folders: [...state.folders, folder] }));
+      return folder;
+    } catch (error) {
+      console.error('Error creating folder:', error);
+      throw error;
+    }
+  },
+  updateFolder: async (id: string, name: string, parentFolderId?: string) => {
+    try {
+      const response = await fetch(`/api/folders/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, parentFolderId }),
+      });
+      if (!response.ok) throw new Error('Failed to update folder');
+      const updatedFolder = await response.json();
+      set(state => ({
+        folders: state.folders.map(f => f.id === id ? updatedFolder : f),
+      }));
+    } catch (error) {
+      console.error('Error updating folder:', error);
+      throw error;
+    }
+  },
+  deleteFolder: async (id: string) => {
+    try {
+      const response = await fetch(`/api/folders/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('Failed to delete folder');
+      set(state => ({
+        folders: state.folders.filter(f => f.id !== id),
+      }));
+    } catch (error) {
+      console.error('Error deleting folder:', error);
+      throw error;
+    }
   },
 
   // UI State

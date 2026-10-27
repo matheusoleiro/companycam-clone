@@ -51,10 +51,22 @@ export interface Project {
   updated_at: string;
 }
 
+// Folders
+export interface Folder {
+  id: string;
+  project_id: string;
+  user_id: string;
+  name: string;
+  parent_folder_id?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 // Photos
 export interface Photo {
   id: string;
   project_id: string;
+  folder_id?: string;
   uploaded_by_id: string;
   storage_path: string;
   public_url?: string;
