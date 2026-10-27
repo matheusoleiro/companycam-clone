@@ -311,11 +311,11 @@ export default function ProjectDetailPage() {
         )}
 
         {/* Controls */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex gap-2">
+        <div className="flex items-center justify-between gap-3 mb-6 flex-wrap sm:flex-nowrap">
+          <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 flex-shrink-0">
             <button
               onClick={() => setViewMode('grid')}
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-2 sm:px-3 py-1 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
                 viewMode === 'grid'
                   ? 'bg-blue-600 text-white'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -325,7 +325,7 @@ export default function ProjectDetailPage() {
             </button>
             <button
               onClick={() => setViewMode('timeline')}
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-2 sm:px-3 py-1 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-colors whitespace-nowrap ${
                 viewMode === 'timeline'
                   ? 'bg-blue-600 text-white'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -336,7 +336,7 @@ export default function ProjectDetailPage() {
             <select
               value={photoSortOrder}
               onChange={(e) => setPhotoSortOrder(e.target.value as 'newest' | 'oldest')}
-              className="px-3 py-2 rounded-md text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300"
+              className="px-2 sm:px-3 py-1 sm:py-2 rounded-md text-xs sm:text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 whitespace-nowrap"
             >
               <option value="newest">Mais recentes</option>
               <option value="oldest">Mais antigas</option>
@@ -345,11 +345,12 @@ export default function ProjectDetailPage() {
               <button
                 onClick={downloadAllPhotos}
                 disabled={isUploading}
-                className="px-3 py-2 rounded-md text-sm font-medium bg-green-100 text-green-700 hover:bg-green-200 border border-green-300 disabled:opacity-50 flex items-center gap-2"
+                className="px-2 sm:px-3 py-1 sm:py-2 rounded-md text-xs sm:text-sm font-medium bg-green-100 text-green-700 hover:bg-green-200 border border-green-300 disabled:opacity-50 flex items-center gap-1 sm:gap-2 whitespace-nowrap"
                 title="Baixar todas as fotos em ZIP"
               >
-                <Download className="w-4 h-4" />
-                Baixar Tudo
+                <Download className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Baixar Tudo</span>
+                <span className="sm:hidden">Baixar</span>
               </button>
             )}
           </div>
@@ -365,15 +366,16 @@ export default function ProjectDetailPage() {
           <button
             onClick={() => document.getElementById('photo-upload')?.click()}
             disabled={isUploading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 gap-2 flex items-center"
+            className="px-3 sm:px-4 py-1 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 gap-1 sm:gap-2 flex items-center whitespace-nowrap flex-shrink-0"
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
             {isUploading ? (
-              <>
-                Uploading {uploadProgress?.completed}/{uploadProgress?.total}...
-              </>
+              <span className="text-xs sm:text-sm">Uploading...</span>
             ) : (
-              'Add Photos'
+              <span className="hidden sm:inline text-sm">Add Photos</span>
+            )}
+            {isUploading && (
+              <span className="text-xs hidden sm:inline">{uploadProgress?.completed}/{uploadProgress?.total}</span>
             )}
           </button>
         </div>
