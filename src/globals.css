@@ -1,60 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================
+   COLOR SYSTEM - OKLCH (Professional + Construction)
+   ============================================ */
 :root {
-  /* Colors - Raw */
-  --color-white: #FFFFFF;
-  --color-black: #000000;
-  --color-slate-50: #F8FAFC;
-  --color-slate-100: #F1F5F9;
-  --color-slate-200: #E2E8F0;
-  --color-slate-300: #CBD5E1;
-  --color-slate-400: #94A3B8;
-  --color-slate-500: #64748B;
-  --color-slate-600: #475569;
-  --color-slate-700: #334155;
-  --color-slate-800: #1E293B;
-  --color-slate-900: #0F172A;
+  /* Primary Palette - Warm Stone */
+  --color-stone-50: oklch(0.98 0.01 90);
+  --color-stone-100: oklch(0.95 0.015 85);
+  --color-stone-200: oklch(0.90 0.02 80);
+  --color-stone-300: oklch(0.85 0.025 75);
+  --color-stone-400: oklch(0.75 0.03 70);
+  --color-stone-500: oklch(0.65 0.035 60);
+  --color-stone-600: oklch(0.55 0.035 55);
+  --color-stone-700: oklch(0.45 0.03 50);
+  --color-stone-800: oklch(0.30 0.025 45);
+  --color-stone-900: oklch(0.15 0.02 40);
 
-  /* Color Roles */
-  --color-bg: var(--color-white);
-  --color-surface: var(--color-slate-50);
-  --color-border: var(--color-slate-200);
-  --color-text-primary: var(--color-slate-900);
-  --color-text-secondary: var(--color-slate-600);
-  --color-text-muted: var(--color-slate-500);
-  --color-accent: #2563EB;
-  --color-success: #059669;
-  --color-danger: #DC2626;
+  /* Accent - Construction Orange (warm, energetic, trustworthy) */
+  --color-accent-light: oklch(0.80 0.15 45);
+  --color-accent-main: oklch(0.68 0.18 35);
+  --color-accent-dark: oklch(0.55 0.16 30);
 
-  /* Typography */
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Semantic Colors */
+  --color-success: oklch(0.70 0.15 150);
+  --color-danger: oklch(0.65 0.18 25);
+  --color-warning: oklch(0.75 0.16 60);
+  --color-info: oklch(0.70 0.15 240);
 
-  /* Spacing */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-6: 24px;
-  --space-8: 32px;
+  /* Background & Surface */
+  --color-bg: var(--color-stone-50);
+  --color-surface: var(--color-stone-100);
+  --color-border: var(--color-stone-200);
+  --color-border-subtle: var(--color-stone-150);
 
-  /* Motion */
+  /* Text */
+  --color-text-primary: var(--color-stone-900);
+  --color-text-secondary: var(--color-stone-700);
+  --color-text-tertiary: var(--color-stone-600);
+  --color-text-muted: var(--color-stone-500);
+  --color-text-inverted: var(--color-stone-50);
+
+  /* ============================================
+     TYPOGRAPHY SYSTEM
+     ============================================ */
+
+  /* Display Font - Syne (bold, geometric, professional) */
+  --font-display: 'Syne', sans-serif;
+
+  /* Body Font - Geist (clean, modern, readable) */
+  --font-body: 'Geist Mono', system-ui, -apple-system, sans-serif;
+
+  /* Size Scale - Modular (1.125 ratio) */
+  --text-xs: 0.75rem;      /* 12px */
+  --text-sm: 0.875rem;     /* 14px */
+  --text-base: 1rem;       /* 16px */
+  --text-lg: 1.125rem;     /* 18px */
+  --text-xl: 1.265rem;     /* 20px */
+  --text-2xl: 1.424rem;    /* 23px */
+  --text-3xl: 1.602rem;    /* 26px */
+  --text-4xl: 1.802rem;    /* 29px */
+  --text-5xl: 2.027rem;    /* 32px */
+  --text-6xl: 2.281rem;    /* 36px */
+  --text-7xl: 2.566rem;    /* 41px */
+
+  /* Line Heights */
+  --line-tight: 1.2;
+  --line-snug: 1.375;
+  --line-normal: 1.5;
+  --line-relaxed: 1.625;
+  --line-loose: 1.875;
+
+  /* Letter Spacing */
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.02em;
+  --tracking-wider: 0.04em;
+
+  /* ============================================
+     SPACING SYSTEM - 4px base
+     ============================================ */
+  --space-0: 0;
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+
+  /* ============================================
+     RADIUS - Intentional, not decorative
+     ============================================ */
+  --radius-none: 0;
+  --radius-sm: 2px;      /* Minimal - inputs, small elements */
+  --radius-md: 4px;      /* Default - cards, buttons */
+  --radius-lg: 8px;      /* Large - modals, panels */
+  --radius-xl: 12px;     /* Extra - hero sections */
+
+  /* ============================================
+     MOTION
+     ============================================ */
   --duration-fast: 100ms;
   --duration-base: 150ms;
-  --duration-slow: 300ms;
+  --duration-slow: 250ms;
+  --duration-slower: 400ms;
+
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+
+  /* ============================================
+     SHADOWS - Functional hierarchy
+     ============================================ */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
+/* ============================================
+   DARK MODE - Construction-focused dark
+   ============================================ */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg: var(--color-slate-900);
-    --color-surface: var(--color-slate-800);
-    --color-border: var(--color-slate-700);
-    --color-text-primary: var(--color-slate-50);
-    --color-text-secondary: var(--color-slate-300);
+    --color-bg: var(--color-stone-900);
+    --color-surface: var(--color-stone-800);
+    --color-border: var(--color-stone-700);
+    --color-border-subtle: var(--color-stone-700);
+
+    --color-text-primary: var(--color-stone-100);
+    --color-text-secondary: var(--color-stone-300);
+    --color-text-tertiary: var(--color-stone-400);
+    --color-text-muted: var(--color-stone-500);
   }
 }
 
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
@@ -63,26 +155,173 @@
   }
 }
 
-body {
-  font-family: var(--font-sans);
-  color: var(--color-text-primary);
-  background-color: var(--color-bg);
+/* ============================================
+   BASE STYLES
+   ============================================ */
+* {
+  box-sizing: border-box;
 }
 
-/* Focus visible ring */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--line-normal);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg);
+  letter-spacing: var(--tracking-normal);
+}
+
+/* ============================================
+   TYPOGRAPHY STYLES
+   ============================================ */
+
+/* Display Headings - Syne, bold, tight */
+h1 {
+  font-family: var(--font-display);
+  font-size: clamp(var(--text-4xl), 8vw, var(--text-7xl));
+  font-weight: 700;
+  line-height: var(--line-tight);
+  letter-spacing: var(--tracking-tight);
+}
+
+h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-4xl);
+  font-weight: 700;
+  line-height: var(--line-tight);
+  letter-spacing: var(--tracking-tight);
+}
+
+h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  line-height: var(--line-snug);
+  letter-spacing: var(--tracking-normal);
+}
+
+h4 {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  line-height: var(--line-snug);
+}
+
+h5, h6 {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: var(--line-normal);
+}
+
+/* Body Text */
+p {
+  line-height: var(--line-relaxed);
+  color: var(--color-text-secondary);
+}
+
+small {
+  font-size: var(--text-sm);
+  color: var(--color-text-tertiary);
+}
+
+/* ============================================
+   INTERACTIVE STATES
+   ============================================ */
+
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-accent-main);
   outline-offset: 2px;
 }
 
 button:focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-accent-main);
   outline-offset: 2px;
 }
 
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-accent-main);
   outline-offset: 2px;
+}
+
+/* ============================================
+   UTILITY CLASSES - Intentional design
+   ============================================ */
+
+.text-display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
+}
+
+.text-mono {
+  font-family: 'Geist Mono', monospace;
+  font-size: 0.875em;
+}
+
+.surface-elevated {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.surface-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.transition-smooth {
+  transition: all var(--duration-base) var(--ease-out);
+}
+
+.transition-fast {
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+/* ============================================
+   COMPONENT STYLES
+   ============================================ */
+
+/* Inputs - Subtle, focused on content */
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+input:hover,
+textarea:hover,
+select:hover {
+  border-color: var(--color-border);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--color-accent-main);
+  box-shadow: 0 0 0 3px rgba(var(--color-accent-main), 0.1);
+}
+
+/* Placeholder */
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-text-muted);
 }

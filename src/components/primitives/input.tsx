@@ -1,53 +1,75 @@
 'use client';
 
-import { InputHTMLAttributes, ReactNode } from 'react';
+import { InputHTMLAttributes } from 'react';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
-  helperText?: string;
-  variant?: 'sm' | 'md' | 'lg';
+  helpText?: string;
+  icon?: React.ReactNode;
 }
 
 export function Input({
   label,
   error,
-  helperText,
-  variant = 'md',
-  disabled = false,
+  helpText,
+  icon,
   className,
+  disabled,
   ...props
 }: InputProps) {
-  const sizeClasses = {
-    sm: 'h-8 px-3 text-xs',
-    md: 'h-10 px-3 text-sm',
-    lg: 'h-12 px-4 text-base',
-  };
-
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-2">
       {label && (
-        <label className="text-sm font-medium text-slate-900">
+        <label className="text-sm font-medium text-[var(--color-text-primary)]">
           {label}
-          {props.required && <span className="text-red-600 ml-1">*</span>}
+          {props.required && <span className="text-[var(--color-danger)] ml-1">*</span>}
         </label>
       )}
-      <input
-        disabled={disabled}
-        className={`
-          border border-slate-300 rounded-md font-sans
-          placeholder:text-slate-500
-          focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500
-          transition-colors duration-base
-          disabled:opacity-50 disabled:cursor-not-allowed
-          ${error ? 'border-red-500 focus-visible:outline-red-500' : ''}
-          ${sizeClasses[variant]}
-          ${className || ''}
-        `}
-        {...props}
-      />
-      {error && <span className="text-xs text-red-600">{error}</span>}
-      {helperText && !error && <span className="text-xs text-slate-500">{helperText}</span>}
+
+      <div className="relative flex items-center">
+        <input
+          disabled={disabled}
+          className={`
+            w-full h-10 px-4
+            rounded-[var(--radius-sm)]
+            border border-[var(--color-border)]
+            bg-[var(--color-bg)]
+            text-[var(--color-text-primary)]
+            text-sm font-500
+            placeholder-[var(--color-text-muted)]
+            transition-smooth
+            focus:outline-none
+            focus:border-[var(--color-accent-main)]
+            focus:ring-3
+            focus:ring-[rgba(var(--color-accent-main), 0.1)]
+            disabled:opacity-60
+            disabled:cursor-not-allowed
+            ${error ? 'border-[var(--color-danger)]' : ''}
+            ${icon ? 'pl-10' : ''}
+            ${className || ''}
+          `}
+          {...props}
+        />
+
+        {icon && (
+          <div className="absolute left-3 flex items-center justify-center text-[var(--color-text-muted)]">
+            {icon}
+          </div>
+        )}
+      </div>
+
+      {error && (
+        <p className="text-xs text-[var(--color-danger)] font-medium">
+          {error}
+        </p>
+      )}
+
+      {helpText && !error && (
+        <p className="text-xs text-[var(--color-text-muted)]">
+          {helpText}
+        </p>
+      )}
     </div>
   );
 }
