@@ -10,7 +10,7 @@ const strings = getStrings('en');
 interface FolderTreeProps {
   folders: Folder[];
   selectedFolderId?: string;
-  onSelectFolder: (folderId: string | undefined) => void;
+  onSelectFolder: (folderId: string | null) => void;
   onCreateFolder: (name: string, parentFolderId?: string) => Promise<void>;
   onDeleteFolder: (id: string) => Promise<void>;
   onUpdateFolder: (id: string, name: string) => Promise<void>;
@@ -181,10 +181,10 @@ export function FolderTree({
     <div className="flex flex-col gap-2">
       <button
         onClick={() => {
-          onSelectFolder(undefined);
+          onSelectFolder(null);
         }}
         className={`text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-          selectedFolderId === undefined
+          selectedFolderId === null
             ? 'bg-blue-100 text-blue-700'
             : 'hover:bg-slate-100 text-slate-700'
         }`}
@@ -212,7 +212,7 @@ export function FolderTree({
             onKeyDown={(e) => {
               if (e.key === 'Enter') handleCreateFolder();
               if (e.key === 'Escape') {
-                setCreatingParentId(undefined);
+                setCreatingParentId(null);
                 setNewFolderName('');
               }
             }}
