@@ -555,12 +555,12 @@ export default function ProjectDetailPage() {
             )}
 
             {showMoveMenu && selectedPhotoIds.size > 0 && (
-              <div className="mb-4 p-3 bg-white border border-slate-300 rounded-lg shadow-md">
-                <p className="text-sm font-medium mb-2 text-slate-900">Selecione a pasta:</p>
+              <div className="mb-4 p-3 bg-slate-900 border border-slate-700 rounded-lg shadow-md">
+                <p className="text-sm font-medium mb-2 text-white">Selecione a pasta:</p>
                 <div className="space-y-1">
                   <button
                     onClick={() => moveSelectedPhotos(undefined)}
-                    className="block w-full text-left px-3 py-2 hover:bg-blue-50 rounded text-sm text-slate-900 font-medium"
+                    className="block w-full text-left px-3 py-2 hover:bg-slate-700 rounded text-sm text-white font-medium"
                   >
                     📁 All Photos
                   </button>
@@ -568,7 +568,7 @@ export default function ProjectDetailPage() {
                     <button
                       key={folder.id}
                       onClick={() => moveSelectedPhotos(folder.id)}
-                      className="block w-full text-left px-3 py-2 hover:bg-blue-50 rounded text-sm text-slate-900 font-medium"
+                      className="block w-full text-left px-3 py-2 hover:bg-slate-700 rounded text-sm text-white font-medium"
                     >
                       📁 {folder.name}
                     </button>
@@ -615,7 +615,7 @@ export default function ProjectDetailPage() {
                     </button>
 
                     {/* Checkbox */}
-                    <div className="absolute top-2 left-2 bg-white rounded border border-slate-300 p-1 group-hover:opacity-100 transition-opacity"
+                    <div className="absolute top-2 left-2 bg-slate-900 rounded border border-slate-700 p-1 group-hover:opacity-100 transition-opacity"
                       onClick={(e) => {
                         e.stopPropagation();
                         handlePhotoSelect(photo.id, e as any);
@@ -668,12 +668,12 @@ export default function ProjectDetailPage() {
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <div className="absolute top-1 left-1 bg-white rounded border border-slate-300 p-1">
+                      <div className="absolute top-1 left-1 bg-slate-900 rounded border border-slate-700 p-1">
                         <input
                           type="checkbox"
                           checked={isSelected}
                           onChange={() => {}}
-                          className="w-4 h-4 cursor-pointer"
+                          className="w-4 h-4 cursor-pointer accent-blue-500"
                         />
                       </div>
                     </div>
@@ -730,16 +730,16 @@ export default function ProjectDetailPage() {
                     📁
                   </button>
                   {showFolderPicker && (
-                    <div className="absolute right-0 top-10 bg-white text-slate-900 rounded-lg shadow-xl z-50 min-w-[200px] max-h-[300px] overflow-y-auto">
+                    <div className="absolute right-0 top-10 bg-slate-800 text-white rounded-lg shadow-xl z-50 min-w-[200px] max-h-[300px] overflow-y-auto border border-slate-700">
                       <button
                         onClick={async () => {
                           await movePhotoToFolder(selectedPhoto.id, undefined);
                           setShowFolderPicker(false);
                           setSelectedPhoto(null);
                         }}
-                        className="block w-full text-left px-4 py-2 hover:bg-slate-100 border-b border-slate-200"
+                        className="block w-full text-left px-4 py-2 hover:bg-slate-700 border-b border-slate-700"
                       >
-                        All Photos
+                        📁 All Photos
                       </button>
                       {folders.map((folder) => (
                         <button
@@ -749,9 +749,9 @@ export default function ProjectDetailPage() {
                             setShowFolderPicker(false);
                             setSelectedPhoto(null);
                           }}
-                          className="block w-full text-left px-4 py-2 hover:bg-slate-100 border-b border-slate-200"
+                          className="block w-full text-left px-4 py-2 hover:bg-slate-700 border-b border-slate-700"
                         >
-                          {folder.name}
+                          📁 {folder.name}
                         </button>
                       ))}
                     </div>
@@ -978,9 +978,9 @@ export default function ProjectDetailPage() {
         {/* Delete Folder Confirmation Modal */}
         {showDeleteFolderConfirm && folderToDelete && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-              <h2 className="text-xl font-bold text-slate-900 mb-2">Deletar pasta com arquivos?</h2>
-              <p className="text-slate-600 mb-6">
+            <div className="bg-slate-800 rounded-lg shadow-xl max-w-md w-full p-6">
+              <h2 className="text-xl font-bold text-white mb-2">Deletar pasta com arquivos?</h2>
+              <p className="text-slate-300 mb-6">
                 Você realmente deseja deletar esta pasta? Os arquivos serão perdidos.
               </p>
               <div className="flex gap-2 justify-end">
@@ -989,7 +989,7 @@ export default function ProjectDetailPage() {
                     setShowDeleteFolderConfirm(false);
                     setFolderToDelete(null);
                   }}
-                  className="px-4 py-2 bg-slate-300 text-slate-700 rounded-lg hover:bg-slate-400"
+                  className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600"
                 >
                   Cancelar
                 </button>
