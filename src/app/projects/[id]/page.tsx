@@ -304,13 +304,19 @@ export default function ProjectDetailPage() {
       const JSZip = (await import('jszip')).default;
       const zip = new JSZip();
 
+      // Ensure project is loaded
+      let project = currentProject;
+      if (!project) {
+        await selectProject(projectId);
+      }
+
       // Get folder name if selected
       const folderName = selectedFolderId
         ? folders.find(f => f.id === selectedFolderId)?.name
         : null;
 
-      // Build base filename
-      const projectName = currentProject?.name || 'photos';
+      // Build base filename - use project name from Zustand store or as fallback
+      const projectName = (project?.name || currentProject?.name || '').trim() || 'projeto';
       const baseFileName = folderName
         ? `${projectName}-${folderName}`
         : projectName;
