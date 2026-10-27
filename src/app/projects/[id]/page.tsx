@@ -7,6 +7,7 @@ import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/primitives/button';
 import { Plus, Loader, X, Trash2, Edit2, Download } from 'lucide-react';
 import { PhotoViewer } from '@/components/photo-viewer';
+import { FolderTree } from '@/components/folder-tree';
 import { IMAGE_QUALITY, IMAGE_UPLOAD, type QualityLevel } from '@/config/image';
 import { IMAGE_DISPLAY, STORAGE_UNITS } from '@/config/ui';
 import { getStrings } from '@/i18n/strings';
@@ -16,7 +17,7 @@ const strings = getStrings('en');
 export default function ProjectDetailPage() {
   const params = useParams();
   const projectId = params.id as string;
-  const { currentProject, photos, isLoadingPhotos, loadPhotos, uploadPhoto, updatePhoto, deletePhoto, selectProject, updateProject } = useApp();
+  const { currentProject, photos, isLoadingPhotos, loadPhotos, uploadPhoto, updatePhoto, deletePhoto, selectProject, updateProject, folders, isLoadingFolders, loadFolders, createFolder, updateFolder, deleteFolder } = useApp();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<{ completed: number; total: number } | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'timeline'>('grid');
@@ -35,6 +36,7 @@ export default function ProjectDetailPage() {
   const [selectedQuality, setSelectedQuality] = useState<'high' | 'medium' | 'low'>('medium');
   const [photoViewerOpen, setPhotoViewerOpen] = useState(false);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
+  const [selectedFolderId, setSelectedFolderId] = useState<string | undefined>();
 
   useEffect(() => {
     if (projectId) {
@@ -45,6 +47,7 @@ export default function ProjectDetailPage() {
             await selectProject(projectId);
           }
           await loadPhotos(projectId);
+          await loadFolders(projectId);
         } catch (err) {
           console.error('Failed to load data:', err);
         }
@@ -52,6 +55,11 @@ export default function ProjectDetailPage() {
       loadData();
     }
   }, [projectId]);
+
+  // Filter photos by selected folder
+  const filteredPhotos = selectedFolderId
+    ? photos.filter(p => p.folder_id === selectedFolderId)
+    : photos.filter(p => !p.folder_id);
 
   const compressImage = async (file: File, qualityLevel: QualityLevel): Promise<File> => {
     return new Promise((resolve) => {
@@ -248,7 +256,7 @@ export default function ProjectDetailPage() {
   };
 
   // Sort photos based on selected order
-  const sortedPhotos = [...photos].sort((a, b) => {
+  const sortedPhotos = [...filteredPhotos].sort((a, b) => {
     const dateA = new Date(a.captured_at).getTime();
     const dateB = new Date(b.captured_at).getTime();
     return photoSortOrder === 'newest' ? dateB - dateA : dateA - dateB;
@@ -270,8 +278,28 @@ export default function ProjectDetailPage() {
 
   return (
     <MainLayout>
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        {/* Project Header */}
+      <div className="flex h-screen gap-4 px-4 py-6">
+        {/* Sidebar with Folders */}
+        <div className="w-56 border-r border-slate-200 pr-4 overflow-y-auto">
+          <h2 className="text-lg font-bold text-slate-900 mb-4">Folders</h2>
+          {isLoadingFolders ? (
+            <div className="text-slate-600 text-sm">Loading folders...</div>
+          ) : (
+            <FolderTree
+              folders={folders}
+              selectedFolderId={selectedFolderId}
+              onSelectFolder={setSelectedFolderId}
+              onCreateFolder={createFolder}
+              onDeleteFolder={deleteFolder}
+              onUpdateFolder={updateFolder}
+            />
+          )}
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-4xl mx-auto">
+            {/* Project Header */}
         {currentProject && (
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-2">
@@ -697,13 +725,15 @@ export default function ProjectDetailPage() {
           </div>
         )}
 
-        {/* Photo Viewer */}
-        <PhotoViewer
-          photos={photos}
-          initialIndex={selectedPhotoIndex}
-          isOpen={photoViewerOpen}
-          onClose={() => setPhotoViewerOpen(false)}
-        />
+            {/* Photo Viewer */}
+            <PhotoViewer
+              photos={filteredPhotos}
+              initialIndex={selectedPhotoIndex}
+              isOpen={photoViewerOpen}
+              onClose={() => setPhotoViewerOpen(false)}
+            />
+          </div>
+        </div>
       </div>
     </MainLayout>
   );
