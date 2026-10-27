@@ -11,7 +11,7 @@ import { IMAGE_QUALITY, IMAGE_UPLOAD, type QualityLevel } from '@/config/image';
 import { IMAGE_DISPLAY, STORAGE_UNITS } from '@/config/ui';
 import { getStrings } from '@/i18n/strings';
 
-const strings = getStrings('pt');
+const strings = getStrings('en');
 
 export default function ProjectDetailPage() {
   const params = useParams();

@@ -6,7 +6,7 @@ import { Button } from '@/components/primitives/button';
 import { PHOTO_VIEWER } from '@/config/ui';
 import { getStrings } from '@/i18n/strings';
 
-const strings = getStrings('pt');
+const strings = getStrings('en');
 
 interface Photo {
   id: string;

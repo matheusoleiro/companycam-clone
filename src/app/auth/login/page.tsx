@@ -8,7 +8,7 @@ import { getStrings } from '@/i18n/strings';
 
 const demoEmail = process.env.NEXT_PUBLIC_DEMO_EMAIL || 'contractor@example.com';
 const demoPassword = process.env.NEXT_PUBLIC_DEMO_PASSWORD || 'password123';
-const strings = getStrings('pt');
+const strings = getStrings('en');
 
 export default function LoginPage() {
   const router = useRouter();
