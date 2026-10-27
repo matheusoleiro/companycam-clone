@@ -504,6 +504,52 @@ export default function ProjectDetailPage() {
           </button>
         </div>
 
+        {/* Selected Photos Actions Bar */}
+        {selectedPhotoIds.size > 0 && viewMode === 'timeline' && (
+          <div className="mb-4 p-3 bg-blue-50 rounded-lg flex items-center justify-between">
+            <span className="text-sm font-medium text-blue-900">
+              {selectedPhotoIds.size} foto{selectedPhotoIds.size !== 1 ? 's' : ''} selecionada{selectedPhotoIds.size !== 1 ? 's' : ''}
+            </span>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowMoveMenu(!showMoveMenu)}
+                className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+              >
+                Mover para pasta
+              </button>
+              <button
+                onClick={() => setSelectedPhotoIds(new Set())}
+                className="px-3 py-1 bg-slate-300 text-slate-700 text-xs rounded hover:bg-slate-400"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        )}
+
+        {showMoveMenu && selectedPhotoIds.size > 0 && viewMode === 'timeline' && (
+          <div className="mb-4 p-3 bg-slate-900 border border-slate-700 rounded-lg shadow-md">
+            <p className="text-sm font-medium mb-2 text-white">Selecione a pasta:</p>
+            <div className="space-y-1">
+              <button
+                onClick={() => moveSelectedPhotos(undefined)}
+                className="block w-full text-left px-3 py-2 hover:bg-slate-700 rounded text-sm text-white font-medium"
+              >
+                📁 All Photos (remover da pasta)
+              </button>
+              {folders.map((folder) => (
+                <button
+                  key={folder.id}
+                  onClick={() => moveSelectedPhotos(folder.id)}
+                  className="block w-full text-left px-3 py-2 hover:bg-slate-700 rounded text-sm text-white font-medium"
+                >
+                  📁 {folder.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Photos Grid or Timeline */}
         {isLoadingPhotos ? (
           <div className="flex items-center justify-center py-16">
@@ -554,7 +600,7 @@ export default function ProjectDetailPage() {
               </div>
             )}
 
-            {showMoveMenu && selectedPhotoIds.size > 0 && (
+            {showMoveMenu && selectedPhotoIds.size > 0 && viewMode === 'grid' && (
               <div className="mb-4 p-3 bg-slate-900 border border-slate-700 rounded-lg shadow-md">
                 <p className="text-sm font-medium mb-2 text-white">Selecione a pasta:</p>
                 <div className="space-y-1">
@@ -562,7 +608,7 @@ export default function ProjectDetailPage() {
                     onClick={() => moveSelectedPhotos(undefined)}
                     className="block w-full text-left px-3 py-2 hover:bg-slate-700 rounded text-sm text-white font-medium"
                   >
-                    📁 All Photos
+                    📁 All Photos (remover da pasta)
                   </button>
                   {folders.map((folder) => (
                     <button
