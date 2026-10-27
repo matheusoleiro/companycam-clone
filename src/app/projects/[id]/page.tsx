@@ -6,6 +6,7 @@ import { useApp } from '@/store/app';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/primitives/button';
 import { Plus, Loader, X, Trash2, Edit2, Download } from 'lucide-react';
+import { PhotoViewer } from '@/components/photo-viewer';
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -27,6 +28,8 @@ export default function ProjectDetailPage() {
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [showQualityMenu, setShowQualityMenu] = useState(false);
   const [selectedQuality, setSelectedQuality] = useState<'high' | 'medium' | 'low'>('medium');
+  const [photoViewerOpen, setPhotoViewerOpen] = useState(false);
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
 
   useEffect(() => {
     if (projectId) {
@@ -406,7 +409,10 @@ export default function ProjectDetailPage() {
             {sortedPhotos.map((photo) => (
               <div key={photo.id} className="relative group">
                 <button
-                  onClick={() => setSelectedPhoto(photo)}
+                  onClick={() => {
+                    setSelectedPhotoIndex(sortedPhotos.indexOf(photo));
+                    setPhotoViewerOpen(true);
+                  }}
                   className="w-full block"
                 >
                   <div className="bg-slate-100 aspect-square rounded-lg overflow-hidden cursor-pointer">
@@ -504,7 +510,7 @@ export default function ProjectDetailPage() {
               <img
                 src={selectedPhoto.public_url}
                 alt="Photo"
-                className="w-full h-full object-contain rounded-lg"
+                className="max-h-[70vh] w-auto object-contain rounded-lg"
               />
               <div className="text-white text-center mt-4">
                 {selectedPhoto.name && (
@@ -694,6 +700,13 @@ export default function ProjectDetailPage() {
           </div>
         )}
 
+        {/* Photo Viewer */}
+        <PhotoViewer
+          photos={photos}
+          initialIndex={selectedPhotoIndex}
+          isOpen={photoViewerOpen}
+          onClose={() => setPhotoViewerOpen(false)}
+        />
       </div>
     </MainLayout>
   );
