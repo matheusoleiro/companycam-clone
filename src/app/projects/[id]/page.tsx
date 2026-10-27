@@ -43,6 +43,7 @@ export default function ProjectDetailPage() {
   const [showMoveMenu, setShowMoveMenu] = useState(false);
   const [showDeleteFolderConfirm, setShowDeleteFolderConfirm] = useState(false);
   const [folderToDelete, setFolderToDelete] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (projectId) {
@@ -388,8 +389,8 @@ export default function ProjectDetailPage() {
   return (
     <MainLayout>
       <div className="flex h-screen gap-4 px-4 py-6">
-        {/* Sidebar with Folders */}
-        <div className="w-72 border-r border-slate-200 pr-4 overflow-y-auto">
+        {/* Sidebar with Folders - Desktop */}
+        <div className="hidden lg:flex flex-col w-72 border-r border-slate-200 pr-4 overflow-y-auto">
           <h2 className="text-lg font-bold text-slate-900 mb-4">Folders</h2>
           {isLoadingFolders ? (
             <div className="text-slate-600 text-sm">Loading folders...</div>
@@ -421,6 +422,52 @@ export default function ProjectDetailPage() {
           )}
         </div>
 
+        {/* Sidebar Mobile Overlay */}
+        {sidebarOpen && (
+          <div className="fixed inset-0 z-40 lg:hidden bg-black/50" onClick={() => setSidebarOpen(false)} />
+        )}
+        <div className={`fixed left-0 top-0 h-screen w-72 bg-white border-r border-slate-200 pr-4 overflow-y-auto transition-transform lg:hidden z-50 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}>
+          <div className="flex items-center justify-between mb-4 pt-4">
+            <h2 className="text-lg font-bold text-slate-900">Folders</h2>
+            <button onClick={() => setSidebarOpen(false)} className="p-2 hover:bg-slate-100">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          {isLoadingFolders ? (
+            <div className="text-slate-600 text-sm">Loading folders...</div>
+          ) : (
+            <FolderTree
+              folders={folders}
+              selectedFolderId={selectedFolderId}
+              onSelectFolder={(folderId) => {
+                handleSelectFolder(folderId);
+                setSidebarOpen(false);
+              }}
+              onCreateFolder={handleCreateFolder}
+              onDeleteFolder={async (id) => {
+                setFolderToDelete(id);
+                const folder = folders.find(f => f.id === id);
+                const folderPhotos = photos.filter(p => p.folder_id === id);
+
+                if (folderPhotos.length > 0) {
+                  setShowDeleteFolderConfirm(true);
+                } else {
+                  await deleteFolder(id);
+                }
+              }}
+              onUpdateFolder={handleUpdateFolder}
+              onDropPhotos={async (photoIds, folderId) => {
+                const updates = photoIds.map(photoId =>
+                  movePhotoToFolder(photoId, folderId)
+                );
+                await Promise.all(updates);
+              }}
+            />
+          )}
+        </div>
+
         {/* Main Content */}
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-4xl mx-auto">
@@ -428,6 +475,11 @@ export default function ProjectDetailPage() {
         {currentProject && (
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-2">
+              <button onClick={() => setSidebarOpen(!sidebarOpen)} className="lg:hidden p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
               <h1 className="text-3xl font-bold text-slate-900">{currentProject.name}</h1>
               <button
                 onClick={() => {
