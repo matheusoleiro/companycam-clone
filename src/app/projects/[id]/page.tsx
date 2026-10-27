@@ -864,17 +864,31 @@ export default function ProjectDetailPage() {
                   <X className="w-6 h-6" />
                 </button>
               </div>
-              <img
-                src={selectedPhoto.public_url}
-                alt="Photo"
+              <div
                 style={{
                   maxHeight: `${IMAGE_DISPLAY.maxPhotoViewerHeight}`,
                   maxWidth: '100%',
-                  width: 'auto',
-                  height: 'auto',
+                  width: '100%',
+                  overflow: 'hidden',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#1a1a1a',
+                  borderRadius: '8px',
                 }}
-                className="object-contain rounded-lg"
-              />
+              >
+                <img
+                  src={selectedPhoto.public_url}
+                  alt="Photo"
+                  style={{
+                    maxHeight: `${IMAGE_DISPLAY.maxPhotoViewerHeight}`,
+                    maxWidth: '100%',
+                    objectFit: 'cover',
+                    width: '100%',
+                    height: '100%',
+                  }}
+                />
+              </div>
               <div className="text-white text-center mt-4">
                 {selectedPhoto.name && (
                   <p className="font-semibold">{selectedPhoto.name}</p>
