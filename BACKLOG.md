@@ -66,6 +66,25 @@ Recursos planejados para iterações futuras.
 
 ---
 
+## 🟡 Code Quality & Refactoring (v3)
+
+### Remove Hardcoded Values
+- [ ] **Security:** Remove demo credentials (contractor@example.com, password123)
+  - Move to `.env.local` and `.env.example`
+  - Update seed data
+- [ ] **Configuration:** Extract magic numbers to config files
+  - Create `src/config/image.ts` (compression settings: 4096, 2048, 1024, 0.75, 0.5)
+  - Create `src/config/ui.ts` (layout constants: 70vh, placeholder URLs)
+  - Create `src/config/constants.ts` (batch size: 5, string limits: 8)
+- [ ] **Internationalization:** Create i18n for mixed PT/EN strings
+  - Create `src/i18n/strings.ts` (Portuguese + English)
+  - Replace hardcoded strings with translation keys
+  - Consider next-intl library for full i18n support
+
+**See:** `HARDCODED_AUDIT.md` for detailed list (25+ hardcodes)
+
+---
+
 ## 🟢 Nice to Have (v4+)
 
 ### Mídia Avançada
