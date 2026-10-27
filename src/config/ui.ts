@@ -17,6 +17,19 @@ export const PHOTO_VIEWER = {
   transitionDuration: 'duration-200',
 } as const;
 
+export const IMAGE_DISPLAY = {
+  placeholders: {
+    grid: 'https://via.placeholder.com/300',
+    timeline: 'https://via.placeholder.com/100',
+  },
+  maxPhotoViewerHeight: '70vh',
+  gridColumns: {
+    mobile: 2,
+    tablet: 3,
+    desktop: 4,
+  },
+} as const;
+
 export const STORAGE_UNITS = {
   bytesToMB: 1024 * 1024,
   bytesToGB: 1024 * 1024 * 1024,
