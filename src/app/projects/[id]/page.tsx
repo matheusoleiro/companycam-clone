@@ -105,9 +105,16 @@ export default function ProjectDetailPage() {
         newSelected.add(photoIds[i]);
       }
       setSelectedPhotoIds(newSelected);
+      setLastSelectedPhotoId(photoId);
     } else {
-      // Regular click: select only this
-      setSelectedPhotoIds(new Set([photoId]));
+      // Regular click on checkbox: toggle this photo
+      const newSelected = new Set(selectedPhotoIds);
+      if (newSelected.has(photoId)) {
+        newSelected.delete(photoId);
+      } else {
+        newSelected.add(photoId);
+      }
+      setSelectedPhotoIds(newSelected);
       setLastSelectedPhotoId(photoId);
     }
   };
@@ -548,22 +555,22 @@ export default function ProjectDetailPage() {
             )}
 
             {showMoveMenu && selectedPhotoIds.size > 0 && (
-              <div className="mb-4 p-3 bg-white border border-slate-200 rounded-lg">
-                <p className="text-sm font-medium mb-2">Selecione a pasta:</p>
+              <div className="mb-4 p-3 bg-white border border-slate-300 rounded-lg shadow-md">
+                <p className="text-sm font-medium mb-2 text-slate-900">Selecione a pasta:</p>
                 <div className="space-y-1">
                   <button
                     onClick={() => moveSelectedPhotos(undefined)}
-                    className="block w-full text-left px-3 py-2 hover:bg-slate-100 rounded text-sm"
+                    className="block w-full text-left px-3 py-2 hover:bg-blue-50 rounded text-sm text-slate-900 font-medium"
                   >
-                    All Photos
+                    📁 All Photos
                   </button>
                   {folders.map((folder) => (
                     <button
                       key={folder.id}
                       onClick={() => moveSelectedPhotos(folder.id)}
-                      className="block w-full text-left px-3 py-2 hover:bg-slate-100 rounded text-sm"
+                      className="block w-full text-left px-3 py-2 hover:bg-blue-50 rounded text-sm text-slate-900 font-medium"
                     >
-                      {folder.name}
+                      📁 {folder.name}
                     </button>
                   ))}
                 </div>
@@ -640,32 +647,54 @@ export default function ProjectDetailPage() {
           </div>
         ) : (
           <div className="space-y-4">
-            {sortedPhotos.map((photo) => (
-              <button
-                key={photo.id}
-                onClick={() => setSelectedPhoto(photo)}
-                className="w-full flex gap-4 p-4 bg-white border border-slate-200 rounded-lg hover:shadow-md transition-shadow text-left"
-              >
-                <div className="w-24 h-24 bg-slate-100 rounded-md flex-shrink-0">
-                  <img
-                    src={photo.public_url || `${IMAGE_DISPLAY.placeholders.timeline}?text=${photo.id.substring(0, 8)}`}
-                    alt={`Project photo ${photo.id}`}
-                    className="w-full h-full object-cover rounded-md"
-                  />
+            {sortedPhotos.map((photo) => {
+              const isSelected = selectedPhotoIds.has(photo.id);
+              return (
+                <div
+                  key={photo.id}
+                  className={`w-full flex gap-4 p-4 bg-white border rounded-lg hover:shadow-md transition-all text-left ${
+                    isSelected ? 'ring-2 ring-blue-500 border-blue-500' : 'border-slate-200'
+                  }`}
+                >
+                  <div
+                    className="flex-shrink-0 cursor-pointer"
+                    onClick={() => handlePhotoSelect(photo.id, { ctrlKey: false, metaKey: false, shiftKey: false } as any)}
+                  >
+                    <div className="relative">
+                      <div className="w-24 h-24 bg-slate-100 rounded-md overflow-hidden">
+                        <img
+                          src={photo.public_url || `${IMAGE_DISPLAY.placeholders.timeline}?text=${photo.id.substring(0, 8)}`}
+                          alt={`Project photo ${photo.id}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="absolute top-1 left-1 bg-white rounded border border-slate-300 p-1">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => {}}
+                          className="w-4 h-4 cursor-pointer"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSelectedPhoto(photo)}
+                    className="flex-1 flex flex-col justify-center text-left"
+                  >
+                    <p className="text-sm font-medium text-slate-900">
+                      {new Date(photo.captured_at).toLocaleString()}
+                    </p>
+                    <p className="text-xs text-slate-600 mt-1">
+                      {(photo.file_size / STORAGE_UNITS.bytesToMB).toFixed(STORAGE_UNITS.decimalPlaces)} {strings.fileSize.mb}
+                    </p>
+                    {photo.is_pending_upload && (
+                      <p className="text-xs text-amber-600 mt-1">Pending sync</p>
+                    )}
+                  </button>
                 </div>
-                <div className="flex-1 flex flex-col justify-center">
-                  <p className="text-sm font-medium text-slate-900">
-                    {new Date(photo.captured_at).toLocaleString()}
-                  </p>
-                  <p className="text-xs text-slate-600 mt-1">
-                    {(photo.file_size / STORAGE_UNITS.bytesToMB).toFixed(STORAGE_UNITS.decimalPlaces)} {strings.fileSize.mb}
-                  </p>
-                  {photo.is_pending_upload && (
-                    <p className="text-xs text-amber-600 mt-1">Pending sync</p>
-                  )}
-                </div>
-              </button>
-            ))}
+              );
+            })}
           </div>
         )}
 
