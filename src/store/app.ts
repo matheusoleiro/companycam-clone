@@ -27,6 +27,7 @@ interface AppState {
   loadPhotos: (projectId: string) => Promise<void>;
   uploadPhoto: (projectId: string, file: File, location?: { latitude?: number; longitude?: number }) => Promise<Photo>;
   updatePhoto: (id: string, name: string) => Promise<void>;
+  movePhotoToFolder: (id: string, folderId: string | undefined) => Promise<void>;
   deletePhoto: (id: string) => Promise<void>;
   selectPhoto: (id: string, selected: boolean) => void;
   clearSelectedPhotos: () => void;
@@ -199,6 +200,18 @@ export const useApp = create<AppState>((set, get) => ({
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error);
+    set(state => ({
+      photos: state.photos.map(p => p.id === id ? data.photo : p),
+    }));
+  },
+  movePhotoToFolder: async (id, folderId) => {
+    const response = await fetch(`/api/photos?id=${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ folder_id: folderId }),
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error);

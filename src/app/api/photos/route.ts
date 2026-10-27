@@ -164,19 +164,23 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name } = body;
+    const { name, folder_id } = body;
 
-    if (!name) {
+    if (!name && folder_id === undefined) {
       return NextResponse.json(
-        { error: 'name is required' },
+        { error: 'name or folder_id is required' },
         { status: 400 }
       );
     }
 
     // Update photo
+    const updateData: any = {};
+    if (name) updateData.name = name;
+    if (folder_id !== undefined) updateData.folder_id = folder_id;
+
     const { data: photo, error } = await supabase
       .from('photos')
-      .update({ name })
+      .update(updateData)
       .eq('id', photoId)
       .select()
       .single();

@@ -17,7 +17,7 @@ const strings = getStrings('en');
 export default function ProjectDetailPage() {
   const params = useParams();
   const projectId = params.id as string;
-  const { currentProject, photos, isLoadingPhotos, loadPhotos, uploadPhoto, updatePhoto, deletePhoto, selectProject, updateProject, folders, isLoadingFolders, loadFolders, createFolder, updateFolder, deleteFolder } = useApp();
+  const { currentProject, photos, isLoadingPhotos, loadPhotos, uploadPhoto, updatePhoto, movePhotoToFolder, deletePhoto, selectProject, updateProject, folders, isLoadingFolders, loadFolders, createFolder, updateFolder, deleteFolder } = useApp();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<{ completed: number; total: number } | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'timeline'>('grid');
@@ -37,6 +37,7 @@ export default function ProjectDetailPage() {
   const [photoViewerOpen, setPhotoViewerOpen] = useState(false);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
   const [selectedFolderId, setSelectedFolderId] = useState<string | undefined>();
+  const [showFolderPicker, setShowFolderPicker] = useState(false);
 
   useEffect(() => {
     if (projectId) {
@@ -530,6 +531,42 @@ export default function ProjectDetailPage() {
                 >
                   <Edit2 className="w-6 h-6" />
                 </button>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowFolderPicker(!showFolderPicker)}
+                    className="p-2 text-yellow-400 hover:text-yellow-300"
+                    title="Mover para pasta"
+                  >
+                    📁
+                  </button>
+                  {showFolderPicker && (
+                    <div className="absolute right-0 top-10 bg-white text-slate-900 rounded-lg shadow-xl z-50 min-w-[200px] max-h-[300px] overflow-y-auto">
+                      <button
+                        onClick={async () => {
+                          await movePhotoToFolder(selectedPhoto.id, undefined);
+                          setShowFolderPicker(false);
+                          setSelectedPhoto(null);
+                        }}
+                        className="block w-full text-left px-4 py-2 hover:bg-slate-100 border-b border-slate-200"
+                      >
+                        All Photos
+                      </button>
+                      {folders.map((folder) => (
+                        <button
+                          key={folder.id}
+                          onClick={async () => {
+                            await movePhotoToFolder(selectedPhoto.id, folder.id);
+                            setShowFolderPicker(false);
+                            setSelectedPhoto(null);
+                          }}
+                          className="block w-full text-left px-4 py-2 hover:bg-slate-100 border-b border-slate-200"
+                        >
+                          {folder.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <button
                   onClick={handleDeletePhoto}
                   disabled={isDeleting}

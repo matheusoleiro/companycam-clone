@@ -114,7 +114,7 @@ export function FolderTree({
                   if (e.key === 'Enter') handleUpdateFolder(folder.id);
                   if (e.key === 'Escape') setEditingFolderId(null);
                 }}
-                className="flex-1 px-2 py-1 border border-slate-300 rounded text-sm"
+                className="flex-1 px-2 py-1 border border-slate-300 rounded text-sm text-slate-900"
               />
             ) : (
               <span className="text-sm flex-1 truncate">{folder.name}</span>
@@ -167,7 +167,7 @@ export function FolderTree({
                       setNewFolderName('');
                     }
                   }}
-                  className="flex-1 px-2 py-1 border border-slate-300 rounded text-sm"
+                  className="flex-1 px-2 py-1 border border-slate-300 rounded text-sm text-slate-900"
                 />
               </div>
             )}
@@ -220,7 +220,7 @@ export function FolderTree({
               if (newFolderName.trim()) handleCreateFolder();
               else setNewFolderName('');
             }}
-            className="flex-1 px-2 py-1 border border-slate-300 rounded text-sm"
+            className="flex-1 px-2 py-1 border border-slate-300 rounded text-sm text-slate-900"
           />
         </div>
       )}
