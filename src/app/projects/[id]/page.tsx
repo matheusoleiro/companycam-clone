@@ -304,6 +304,17 @@ export default function ProjectDetailPage() {
       const JSZip = (await import('jszip')).default;
       const zip = new JSZip();
 
+      // Get folder name if selected
+      const folderName = selectedFolderId
+        ? folders.find(f => f.id === selectedFolderId)?.name
+        : null;
+
+      // Build base filename
+      const projectName = currentProject?.name || 'photos';
+      const baseFileName = folderName
+        ? `${projectName}-${folderName}`
+        : projectName;
+
       // Add each photo to the ZIP
       for (let i = 0; i < sortedPhotos.length; i++) {
         const photo = sortedPhotos[i];
@@ -322,7 +333,7 @@ export default function ProjectDetailPage() {
           }
 
           const arrayBuffer = await response.arrayBuffer();
-          const fileName = `photo-${i + 1}.jpg`;
+          const fileName = `${baseFileName}-foto-${i + 1}.jpg`;
           zip.file(fileName, arrayBuffer);
         } catch (photoErr) {
           console.warn(`Error downloading photo ${i + 1}:`, photoErr);
@@ -333,7 +344,8 @@ export default function ProjectDetailPage() {
       const zipBlob = await zip.generateAsync({ type: 'blob' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(zipBlob);
-      link.download = `${currentProject?.name || 'photos'}-${new Date().toISOString().split('T')[0]}.zip`;
+      const zipFileName = `${baseFileName}-${new Date().toISOString().split('T')[0]}.zip`;
+      link.download = zipFileName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
