@@ -62,6 +62,10 @@ export default function ProjectDetailPage() {
     : photos.filter(p => !p.folder_id);
 
   // Wrapper functions for FolderTree
+  const handleSelectFolder = (folderId: string | null) => {
+    setSelectedFolderId(folderId || undefined);
+  };
+
   const handleCreateFolder = async (name: string, parentFolderId?: string) => {
     await createFolder(projectId, name, parentFolderId);
   };
@@ -296,8 +300,8 @@ export default function ProjectDetailPage() {
           ) : (
             <FolderTree
               folders={folders}
-              selectedFolderId={selectedFolderId}
-              onSelectFolder={setSelectedFolderId}
+              selectedFolderId={selectedFolderId || null}
+              onSelectFolder={handleSelectFolder}
               onCreateFolder={handleCreateFolder}
               onDeleteFolder={deleteFolder}
               onUpdateFolder={handleUpdateFolder}
