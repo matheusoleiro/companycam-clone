@@ -38,6 +38,11 @@ export default function ProjectDetailPage() {
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
   const [selectedFolderId, setSelectedFolderId] = useState<string | undefined>();
   const [showFolderPicker, setShowFolderPicker] = useState(false);
+  const [selectedPhotoIds, setSelectedPhotoIds] = useState<Set<string>>(new Set());
+  const [lastSelectedPhotoId, setLastSelectedPhotoId] = useState<string | null>(null);
+  const [showMoveMenu, setShowMoveMenu] = useState(false);
+  const [showDeleteFolderConfirm, setShowDeleteFolderConfirm] = useState(false);
+  const [folderToDelete, setFolderToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     if (projectId) {
@@ -73,6 +78,71 @@ export default function ProjectDetailPage() {
 
   const handleUpdateFolder = async (id: string, name: string, parentFolderId?: string) => {
     await updateFolder(id, name, parentFolderId);
+  };
+
+  const handlePhotoSelect = (photoId: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+
+    if (event.ctrlKey || event.metaKey) {
+      // Ctrl/Cmd + Click: toggle selection
+      const newSelected = new Set(selectedPhotoIds);
+      if (newSelected.has(photoId)) {
+        newSelected.delete(photoId);
+      } else {
+        newSelected.add(photoId);
+      }
+      setSelectedPhotoIds(newSelected);
+      setLastSelectedPhotoId(photoId);
+    } else if (event.shiftKey && lastSelectedPhotoId) {
+      // Shift + Click: range selection
+      const photoIds = sortedPhotos.map(p => p.id);
+      const startIdx = photoIds.indexOf(lastSelectedPhotoId);
+      const endIdx = photoIds.indexOf(photoId);
+      const [minIdx, maxIdx] = startIdx <= endIdx ? [startIdx, endIdx] : [endIdx, startIdx];
+
+      const newSelected = new Set(selectedPhotoIds);
+      for (let i = minIdx; i <= maxIdx; i++) {
+        newSelected.add(photoIds[i]);
+      }
+      setSelectedPhotoIds(newSelected);
+    } else {
+      // Regular click: select only this
+      setSelectedPhotoIds(new Set([photoId]));
+      setLastSelectedPhotoId(photoId);
+    }
+  };
+
+  const moveSelectedPhotos = async (folderId: string | undefined) => {
+    const updates = Array.from(selectedPhotoIds).map(photoId =>
+      movePhotoToFolder(photoId, folderId)
+    );
+    await Promise.all(updates);
+    setSelectedPhotoIds(new Set());
+    setShowMoveMenu(false);
+  };
+
+  const handleDeleteFolder = async () => {
+    if (!folderToDelete) return;
+
+    const folder = folders.find(f => f.id === folderToDelete);
+    const folderPhotos = photos.filter(p => p.folder_id === folderToDelete);
+
+    if (folderPhotos.length > 0) {
+      // Folder has photos - show confirmation
+      setShowDeleteFolderConfirm(true);
+      return;
+    }
+
+    // Folder is empty - delete it
+    await deleteFolder(folderToDelete);
+    setFolderToDelete(null);
+  };
+
+  const confirmDeleteFolder = async () => {
+    if (!folderToDelete) return;
+    await deleteFolder(folderToDelete);
+    setShowDeleteFolderConfirm(false);
+    setFolderToDelete(null);
   };
 
   const compressImage = async (file: File, qualityLevel: QualityLevel): Promise<File> => {
@@ -304,7 +374,17 @@ export default function ProjectDetailPage() {
               selectedFolderId={selectedFolderId}
               onSelectFolder={handleSelectFolder}
               onCreateFolder={handleCreateFolder}
-              onDeleteFolder={deleteFolder}
+              onDeleteFolder={async (id) => {
+                setFolderToDelete(id);
+                const folder = folders.find(f => f.id === id);
+                const folderPhotos = photos.filter(p => p.folder_id === id);
+
+                if (folderPhotos.length > 0) {
+                  setShowDeleteFolderConfirm(true);
+                } else {
+                  await deleteFolder(id);
+                }
+              }}
               onUpdateFolder={handleUpdateFolder}
             />
           )}
@@ -444,38 +524,119 @@ export default function ProjectDetailPage() {
             </button>
           </div>
         ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {sortedPhotos.map((photo) => (
-              <div key={photo.id} className="relative group">
-                <button
-                  onClick={() => {
-                    setSelectedPhotoIndex(sortedPhotos.indexOf(photo));
-                    setPhotoViewerOpen(true);
-                  }}
-                  className="w-full block"
-                >
-                  <div className="bg-slate-100 aspect-square rounded-lg overflow-hidden cursor-pointer">
-                    <img
-                      src={photo.public_url || `${IMAGE_DISPLAY.placeholders.grid}?text=${photo.id.substring(0, 8)}`}
-                      alt={`Project photo ${photo.id}`}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                    />
-                  </div>
-                </button>
-
-                {/* Overlay Status */}
-                {photo.is_pending_upload && (
-                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
-                    <span className="text-white text-xs font-medium">Pending sync</span>
-                  </div>
-                )}
-
-                {/* Metadata */}
-                <div className="text-xs text-slate-600 mt-2">
-                  {new Date(photo.captured_at).toLocaleDateString()}
+          <div>
+            {selectedPhotoIds.size > 0 && (
+              <div className="mb-4 p-3 bg-blue-50 rounded-lg flex items-center justify-between">
+                <span className="text-sm font-medium text-blue-900">
+                  {selectedPhotoIds.size} foto{selectedPhotoIds.size !== 1 ? 's' : ''} selecionada{selectedPhotoIds.size !== 1 ? 's' : ''}
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowMoveMenu(!showMoveMenu)}
+                    className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+                  >
+                    Mover para pasta
+                  </button>
+                  <button
+                    onClick={() => setSelectedPhotoIds(new Set())}
+                    className="px-3 py-1 bg-slate-300 text-slate-700 text-xs rounded hover:bg-slate-400"
+                  >
+                    Cancelar
+                  </button>
                 </div>
               </div>
-            ))}
+            )}
+
+            {showMoveMenu && selectedPhotoIds.size > 0 && (
+              <div className="mb-4 p-3 bg-white border border-slate-200 rounded-lg">
+                <p className="text-sm font-medium mb-2">Selecione a pasta:</p>
+                <div className="space-y-1">
+                  <button
+                    onClick={() => moveSelectedPhotos(undefined)}
+                    className="block w-full text-left px-3 py-2 hover:bg-slate-100 rounded text-sm"
+                  >
+                    All Photos
+                  </button>
+                  {folders.map((folder) => (
+                    <button
+                      key={folder.id}
+                      onClick={() => moveSelectedPhotos(folder.id)}
+                      className="block w-full text-left px-3 py-2 hover:bg-slate-100 rounded text-sm"
+                    >
+                      {folder.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {sortedPhotos.map((photo) => {
+                const isSelected = selectedPhotoIds.has(photo.id);
+                return (
+                  <div
+                    key={photo.id}
+                    className={`relative group rounded-lg overflow-hidden cursor-pointer transition-all ${
+                      isSelected ? 'ring-2 ring-blue-500' : ''
+                    }`}
+                    draggable
+                    onDragStart={(e) => {
+                      if (!isSelected) {
+                        setSelectedPhotoIds(new Set([photo.id]));
+                      }
+                    }}
+                    onDragEnd={() => {}}
+                  >
+                    <button
+                      onClick={(e) => {
+                        if (e.shiftKey || e.ctrlKey || e.metaKey) {
+                          handlePhotoSelect(photo.id, e as any);
+                        } else {
+                          setSelectedPhotoIndex(sortedPhotos.indexOf(photo));
+                          setPhotoViewerOpen(true);
+                        }
+                      }}
+                      className="w-full block"
+                    >
+                      <div className="bg-slate-100 aspect-square overflow-hidden">
+                        <img
+                          src={photo.public_url || `${IMAGE_DISPLAY.placeholders.grid}?text=${photo.id.substring(0, 8)}`}
+                          alt={`Project photo ${photo.id}`}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        />
+                      </div>
+                    </button>
+
+                    {/* Checkbox */}
+                    <div className="absolute top-2 left-2 bg-white rounded border border-slate-300 p-1 group-hover:opacity-100 transition-opacity"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePhotoSelect(photo.id, e as any);
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => {}}
+                        className="w-4 h-4 cursor-pointer"
+                      />
+                    </div>
+
+                    {/* Overlay Status */}
+                    {photo.is_pending_upload && (
+                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                        <span className="text-white text-xs font-medium">Pending sync</span>
+                      </div>
+                    )}
+
+                    {/* Metadata */}
+                    <div className="text-xs text-slate-600 mt-2">
+                      {new Date(photo.captured_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         ) : (
           <div className="space-y-4">
@@ -784,6 +945,35 @@ export default function ProjectDetailPage() {
             />
           </div>
         </div>
+
+        {/* Delete Folder Confirmation Modal */}
+        {showDeleteFolderConfirm && folderToDelete && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+              <h2 className="text-xl font-bold text-slate-900 mb-2">Deletar pasta com arquivos?</h2>
+              <p className="text-slate-600 mb-6">
+                Você realmente deseja deletar esta pasta? Os arquivos serão perdidos.
+              </p>
+              <div className="flex gap-2 justify-end">
+                <button
+                  onClick={() => {
+                    setShowDeleteFolderConfirm(false);
+                    setFolderToDelete(null);
+                  }}
+                  className="px-4 py-2 bg-slate-300 text-slate-700 rounded-lg hover:bg-slate-400"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={confirmDeleteFolder}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                >
+                  Deletar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </MainLayout>
   );
