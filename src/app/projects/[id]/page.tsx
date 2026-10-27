@@ -652,23 +652,29 @@ export default function ProjectDetailPage() {
               return (
                 <div
                   key={photo.id}
-                  className={`w-full flex gap-4 p-4 bg-white border rounded-lg hover:shadow-md transition-all text-left ${
-                    isSelected ? 'ring-2 ring-blue-500 border-blue-500' : 'border-slate-200'
+                  className={`w-full flex gap-4 p-4 border rounded-lg hover:shadow-md transition-all text-left ${
+                    isSelected ? 'ring-2 ring-blue-500 border-blue-500 bg-blue-50' : 'border-slate-200 bg-slate-50'
                   }`}
                 >
                   <div
-                    className="flex-shrink-0 cursor-pointer"
-                    onClick={() => handlePhotoSelect(photo.id, { ctrlKey: false, metaKey: false, shiftKey: false } as any)}
+                    className="flex-shrink-0"
+                    onClick={(e) => handlePhotoSelect(photo.id, e as any)}
                   >
                     <div className="relative">
-                      <div className="w-24 h-24 bg-slate-100 rounded-md overflow-hidden">
+                      <div className="w-24 h-24 bg-slate-100 rounded-md overflow-hidden cursor-pointer hover:opacity-80">
                         <img
                           src={photo.public_url || `${IMAGE_DISPLAY.placeholders.timeline}?text=${photo.id.substring(0, 8)}`}
                           alt={`Project photo ${photo.id}`}
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <div className="absolute top-1 left-1 bg-slate-900 rounded border border-slate-700 p-1">
+                      <div
+                        className="absolute top-1 left-1 bg-slate-900 rounded border border-slate-700 p-1 cursor-pointer hover:bg-slate-800"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePhotoSelect(photo.id, e as any);
+                        }}
+                      >
                         <input
                           type="checkbox"
                           checked={isSelected}
