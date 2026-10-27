@@ -7,6 +7,11 @@ import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/primitives/button';
 import { Plus, Loader, X, Trash2, Edit2, Download } from 'lucide-react';
 import { PhotoViewer } from '@/components/photo-viewer';
+import { IMAGE_QUALITY, IMAGE_UPLOAD, type QualityLevel } from '@/config/image';
+import { IMAGE_DISPLAY, STORAGE_UNITS } from '@/config/ui';
+import { getStrings } from '@/i18n/strings';
+
+const strings = getStrings('pt');
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -48,7 +53,7 @@ export default function ProjectDetailPage() {
     }
   }, [projectId]);
 
-  const compressImage = async (file: File, quality: number): Promise<File> => {
+  const compressImage = async (file: File, qualityLevel: QualityLevel): Promise<File> => {
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -58,11 +63,8 @@ export default function ProjectDetailPage() {
           const canvas = document.createElement('canvas');
           let { width, height } = img;
 
-          // Limit max dimension based on quality
-          let maxDim = 4096;
-          if (quality === 0.5) maxDim = 1024; // low
-          else if (quality === 0.75) maxDim = 2048; // medium
-          // high = 4096
+          const quality = IMAGE_QUALITY[qualityLevel];
+          const maxDim = quality.maxDimension;
 
           if (width > height) {
             if (width > maxDim) {
@@ -97,7 +99,7 @@ export default function ProjectDetailPage() {
               }
             },
             'image/jpeg',
-            quality
+            quality.jpegQuality
           );
         };
         img.src = event.target?.result as string;
@@ -121,21 +123,14 @@ export default function ProjectDetailPage() {
     setUploadProgress({ completed: 0, total: pendingFiles.length });
 
     try {
-      const qualityMap = {
-        high: 1.0,
-        medium: 0.75,
-        low: 0.5,
-      };
-
       // Compress all files
       const compressedFiles = await Promise.all(
-        pendingFiles.map(file => compressImage(file, qualityMap[selectedQuality]))
+        pendingFiles.map(file => compressImage(file, selectedQuality))
       );
 
-      // Upload all files in parallel (5 at a time to avoid overwhelming server)
-      const batchSize = 5;
-      for (let i = 0; i < compressedFiles.length; i += batchSize) {
-        const batch = compressedFiles.slice(i, i + batchSize);
+      // Upload all files in parallel (batch size to avoid overwhelming server)
+      for (let i = 0; i < compressedFiles.length; i += IMAGE_UPLOAD.batchSize) {
+        const batch = compressedFiles.slice(i, i + IMAGE_UPLOAD.batchSize);
         await Promise.all(
           batch.map(async (file) => {
             await uploadPhoto(projectId, file, {});
@@ -346,11 +341,11 @@ export default function ProjectDetailPage() {
                 onClick={downloadAllPhotos}
                 disabled={isUploading}
                 className="px-2 sm:px-3 py-1 sm:py-2 rounded-md text-xs sm:text-sm font-medium bg-green-100 text-green-700 hover:bg-green-200 border border-green-300 disabled:opacity-50 flex items-center gap-1 sm:gap-2 whitespace-nowrap"
-                title="Baixar todas as fotos em ZIP"
+                title={strings.photos.downloadAll}
               >
                 <Download className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">Baixar Tudo</span>
-                <span className="sm:hidden">Baixar</span>
+                <span className="hidden sm:inline">{strings.photos.downloadAll}</span>
+                <span className="sm:hidden">{strings.photos.download}</span>
               </button>
             )}
           </div>
@@ -372,7 +367,7 @@ export default function ProjectDetailPage() {
             {isUploading ? (
               <span className="text-xs sm:text-sm">Uploading...</span>
             ) : (
-              <span className="hidden sm:inline text-sm">Add Photos</span>
+              <span className="hidden sm:inline text-sm">{strings.photos.addPhotos}</span>
             )}
             {isUploading && (
               <span className="text-xs hidden sm:inline">{uploadProgress?.completed}/{uploadProgress?.total}</span>
@@ -403,7 +398,7 @@ export default function ProjectDetailPage() {
               disabled={isUploading}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
-              {isUploading ? `Adding Photos ${uploadProgress?.completed}/${uploadProgress?.total}...` : 'Add Photos'}
+              {isUploading ? `${strings.photos.uploadPhotos} ${uploadProgress?.completed}/${uploadProgress?.total}...` : strings.photos.addPhotos}
             </button>
           </div>
         ) : viewMode === 'grid' ? (
@@ -419,7 +414,7 @@ export default function ProjectDetailPage() {
                 >
                   <div className="bg-slate-100 aspect-square rounded-lg overflow-hidden cursor-pointer">
                     <img
-                      src={photo.public_url || `https://via.placeholder.com/300?text=${photo.id.substring(0, 8)}`}
+                      src={photo.public_url || `${IMAGE_DISPLAY.placeholders.grid}?text=${photo.id.substring(0, 8)}`}
                       alt={`Project photo ${photo.id}`}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                     />
@@ -450,7 +445,7 @@ export default function ProjectDetailPage() {
               >
                 <div className="w-24 h-24 bg-slate-100 rounded-md flex-shrink-0">
                   <img
-                    src={photo.public_url || `https://via.placeholder.com/100?text=${photo.id.substring(0, 8)}`}
+                    src={photo.public_url || `${IMAGE_DISPLAY.placeholders.timeline}?text=${photo.id.substring(0, 8)}`}
                     alt={`Project photo ${photo.id}`}
                     className="w-full h-full object-cover rounded-md"
                   />
@@ -460,7 +455,7 @@ export default function ProjectDetailPage() {
                     {new Date(photo.captured_at).toLocaleString()}
                   </p>
                   <p className="text-xs text-slate-600 mt-1">
-                    {(photo.file_size / 1024 / 1024).toFixed(2)} MB
+                    {(photo.file_size / STORAGE_UNITS.bytesToMB).toFixed(STORAGE_UNITS.decimalPlaces)} {strings.fileSize.mb}
                   </p>
                   {photo.is_pending_upload && (
                     <p className="text-xs text-amber-600 mt-1">Pending sync</p>
@@ -479,7 +474,7 @@ export default function ProjectDetailPage() {
                 <button
                   onClick={() => downloadPhoto(selectedPhoto)}
                   className="p-2 text-green-400 hover:text-green-300"
-                  title="Baixar foto"
+                  title={strings.photos.downloadPhoto}
                 >
                   <Download className="w-6 h-6" />
                 </button>
@@ -512,7 +507,7 @@ export default function ProjectDetailPage() {
               <img
                 src={selectedPhoto.public_url}
                 alt="Photo"
-                className="max-h-[70vh] w-auto object-contain rounded-lg"
+                className={`max-h-[${IMAGE_DISPLAY.maxPhotoViewerHeight}] w-auto object-contain rounded-lg`}
               />
               <div className="text-white text-center mt-4">
                 {selectedPhoto.name && (
@@ -531,9 +526,9 @@ export default function ProjectDetailPage() {
         {showQualityMenu && (
           <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-4">
             <div className="bg-white rounded-t-2xl sm:rounded-lg shadow-xl w-full sm:max-w-md p-6 sm:p-8">
-              <h2 className="text-2xl sm:text-xl font-bold text-slate-900 mb-2">Tamanho da Foto</h2>
+              <h2 className="text-2xl sm:text-xl font-bold text-slate-900 mb-2">{strings.photoQuality.title}</h2>
               <p className="text-base text-slate-600 mb-8">
-                Selecionou {pendingFiles.length} foto{pendingFiles.length > 1 ? 's' : ''}
+                {strings.photoQuality.selected.replace('{count}', pendingFiles.length.toString())}
               </p>
 
               <div className="space-y-4 mb-8">
@@ -545,8 +540,8 @@ export default function ProjectDetailPage() {
                       : 'border-slate-300 hover:border-slate-400'
                   }`}
                 >
-                  <div className="font-bold text-lg text-slate-900">🖼️ Grande</div>
-                  <div className="text-sm text-slate-600 mt-1">Máximo 4096px • Sem compressão</div>
+                  <div className="font-bold text-lg text-slate-900">{strings.photoQuality.high.label}</div>
+                  <div className="text-sm text-slate-600 mt-1">{strings.photoQuality.high.description}</div>
                 </button>
 
                 <button
@@ -557,8 +552,8 @@ export default function ProjectDetailPage() {
                       : 'border-slate-300 hover:border-slate-400'
                   }`}
                 >
-                  <div className="font-bold text-lg text-slate-900">📱 Médio</div>
-                  <div className="text-sm text-slate-600 mt-1">Máximo 2048px • 75% qualidade</div>
+                  <div className="font-bold text-lg text-slate-900">{strings.photoQuality.medium.label}</div>
+                  <div className="text-sm text-slate-600 mt-1">{strings.photoQuality.medium.description}</div>
                 </button>
 
                 <button
@@ -569,8 +564,8 @@ export default function ProjectDetailPage() {
                       : 'border-slate-300 hover:border-slate-400'
                   }`}
                 >
-                  <div className="font-bold text-lg text-slate-900">⚡ Pequeno</div>
-                  <div className="text-sm text-slate-600 mt-1">Máximo 1024px • 50% qualidade</div>
+                  <div className="font-bold text-lg text-slate-900">{strings.photoQuality.low.label}</div>
+                  <div className="text-sm text-slate-600 mt-1">{strings.photoQuality.low.description}</div>
                 </button>
               </div>
 
@@ -582,14 +577,14 @@ export default function ProjectDetailPage() {
                   }}
                   className="flex-1 px-4 py-3 sm:py-2 text-slate-900 bg-slate-100 border border-slate-300 rounded-lg hover:bg-slate-200 font-semibold text-base sm:text-sm"
                 >
-                  Cancelar
+                  {strings.actions.cancel}
                 </button>
                 <button
                   onClick={handleConfirmUpload}
                   disabled={isUploading}
                   className="flex-1 px-4 py-3 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-base sm:text-sm disabled:opacity-50"
                 >
-                  {isUploading ? 'Enviando...' : 'Enviar'}
+                  {isUploading ? `${strings.actions.loading}` : strings.photoQuality.confirm}
                 </button>
               </div>
             </div>

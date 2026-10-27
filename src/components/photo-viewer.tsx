@@ -3,6 +3,10 @@
 import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { Button } from '@/components/primitives/button';
+import { PHOTO_VIEWER } from '@/config/ui';
+import { getStrings } from '@/i18n/strings';
+
+const strings = getStrings('pt');
 
 interface Photo {
   id: string;
@@ -49,12 +53,12 @@ export function PhotoViewer({ photos, initialIndex, isOpen, onClose }: PhotoView
   const currentPhoto = photos[currentIndex];
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center p-4">
+    <div className={`fixed inset-0 z-50 ${PHOTO_VIEWER.backgroundColor} ${PHOTO_VIEWER.backgroundOpacity} flex items-center justify-center p-4`}>
       {/* Close Button */}
       <button
         onClick={onClose}
         className="absolute top-4 right-4 p-2 hover:bg-white hover:bg-opacity-10 rounded-lg transition-colors"
-        aria-label="Close photo viewer"
+        aria-label={strings.photoViewer.closeViewer}
       >
         <X className="w-6 h-6 text-white" />
       </button>
@@ -64,7 +68,7 @@ export function PhotoViewer({ photos, initialIndex, isOpen, onClose }: PhotoView
         onClick={goToPrevious}
         className="absolute left-4 p-2 hover:bg-white hover:bg-opacity-10 rounded-lg transition-colors disabled:opacity-50"
         disabled={photos.length === 1}
-        aria-label="Previous photo"
+        aria-label={strings.photoViewer.previousPhoto}
       >
         <ChevronLeft className="w-8 h-8 text-white" />
       </button>
@@ -75,13 +79,15 @@ export function PhotoViewer({ photos, initialIndex, isOpen, onClose }: PhotoView
           <img
             src={currentPhoto.public_url}
             alt={`Photo ${currentIndex + 1}`}
-            className="max-h-[70vh] w-auto object-contain rounded-lg"
+            className={`max-h-[${PHOTO_VIEWER.maxHeight}] w-auto object-contain rounded-lg`}
           />
         )}
 
         {/* Counter */}
         <div className="text-white text-sm font-medium">
-          {currentIndex + 1} de {photos.length}
+          {strings.photoViewer.photoCount
+            .replace('{current}', (currentIndex + 1).toString())
+            .replace('{total}', photos.length.toString())}
         </div>
       </div>
 
@@ -90,7 +96,7 @@ export function PhotoViewer({ photos, initialIndex, isOpen, onClose }: PhotoView
         onClick={goToNext}
         className="absolute right-4 p-2 hover:bg-white hover:bg-opacity-10 rounded-lg transition-colors disabled:opacity-50"
         disabled={photos.length === 1}
-        aria-label="Next photo"
+        aria-label={strings.photoViewer.nextPhoto}
       >
         <ChevronRight className="w-8 h-8 text-white" />
       </button>

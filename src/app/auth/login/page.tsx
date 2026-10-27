@@ -4,12 +4,17 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/primitives/button';
+import { getStrings } from '@/i18n/strings';
+
+const demoEmail = process.env.NEXT_PUBLIC_DEMO_EMAIL || 'contractor@example.com';
+const demoPassword = process.env.NEXT_PUBLIC_DEMO_PASSWORD || 'password123';
+const strings = getStrings('pt');
 
 export default function LoginPage() {
   const router = useRouter();
   const supabase = createClient();
-  const [email, setEmail] = useState('contractor@example.com');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState(demoEmail);
+  const [password, setPassword] = useState(demoPassword);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -67,7 +72,7 @@ export default function LoginPage() {
             </label>
             <input
               type="email"
-              placeholder="contractor@example.com"
+              placeholder={demoEmail}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -104,8 +109,8 @@ export default function LoginPage() {
         {/* Footer */}
         <div className="text-center text-sm text-slate-600 border-t border-slate-200 pt-6">
           <p className="font-medium">Demo credentials:</p>
-          <p className="text-xs mt-2">Email: <code className="bg-slate-100 px-2 py-1 rounded">contractor@example.com</code></p>
-          <p className="text-xs">Password: <code className="bg-slate-100 px-2 py-1 rounded">password123</code></p>
+          <p className="text-xs mt-2">Email: <code className="bg-slate-100 px-2 py-1 rounded">{demoEmail}</code></p>
+          <p className="text-xs">Password: <code className="bg-slate-100 px-2 py-1 rounded">{demoPassword}</code></p>
         </div>
       </div>
     </div>
