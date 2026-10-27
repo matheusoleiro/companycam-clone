@@ -27,6 +27,7 @@ export function FolderTree({
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
   const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
+  const [isCreatingRoot, setIsCreatingRoot] = useState(false);
   const [creatingParentId, setCreatingParentId] = useState<string | null>(null);
   const [newFolderName, setNewFolderName] = useState('');
 
@@ -45,6 +46,7 @@ export function FolderTree({
     try {
       await onCreateFolder(newFolderName, parentId);
       setNewFolderName('');
+      setIsCreatingRoot(false);
       setCreatingParentId(null);
       if (parentId) {
         setExpandedFolders(new Set([...expandedFolders, parentId]));
@@ -193,14 +195,14 @@ export function FolderTree({
       </button>
 
       <button
-        onClick={() => setCreatingParentId(null)}
+        onClick={() => setIsCreatingRoot(true)}
         className="flex items-center gap-2 px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
       >
         <Plus className="w-4 h-4" />
         New Folder
       </button>
 
-      {creatingParentId === null && (
+      {isCreatingRoot && (
         <div className="flex items-center gap-2 px-3 py-2">
           <Plus className="w-4 h-4 text-slate-400" />
           <input
@@ -212,13 +214,16 @@ export function FolderTree({
             onKeyDown={(e) => {
               if (e.key === 'Enter') handleCreateFolder();
               if (e.key === 'Escape') {
-                setCreatingParentId(null);
+                setIsCreatingRoot(false);
                 setNewFolderName('');
               }
             }}
             onBlur={() => {
               if (newFolderName.trim()) handleCreateFolder();
-              else setNewFolderName('');
+              else {
+                setIsCreatingRoot(false);
+                setNewFolderName('');
+              }
             }}
             className="flex-1 px-2 py-1 border border-slate-300 rounded text-sm text-slate-900"
           />
