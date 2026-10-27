@@ -65,7 +65,7 @@ export default function ProjectDetailPage() {
   // Filter photos by selected folder
   const filteredPhotos = selectedFolderId
     ? photos.filter(p => p.folder_id === selectedFolderId)
-    : photos.filter(p => !p.folder_id);
+    : photos;
 
   // Wrapper functions for FolderTree
   const handleSelectFolder = (folderId: string | undefined) => {
