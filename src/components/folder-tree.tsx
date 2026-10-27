@@ -110,7 +110,7 @@ export function FolderTree({
           {children.length > 0 && (
             <button
               onClick={() => toggleExpanded(folder.id)}
-              className="p-0 hover:bg-slate-200 rounded"
+              className="p-0 hover:bg-slate-200 rounded flex-shrink-0"
             >
               {isExpanded ? (
                 <ChevronDown className="w-4 h-4" />
@@ -119,7 +119,7 @@ export function FolderTree({
               )}
             </button>
           )}
-          {children.length === 0 && <div className="w-4" />}
+          {children.length === 0 && <div className="w-4 flex-shrink-0" />}
 
           <button
             onClick={() => onSelectFolder(folder.id)}
