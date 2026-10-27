@@ -59,13 +59,16 @@ export async function POST(request: NextRequest) {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Database insert error:', error);
+      throw error;
+    }
 
     return NextResponse.json(data, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating folder:', error);
     return NextResponse.json(
-      { error: 'Failed to create folder' },
+      { error: error?.message || 'Failed to create folder' },
       { status: 500 }
     );
   }
