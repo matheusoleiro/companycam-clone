@@ -61,6 +61,15 @@ export default function ProjectDetailPage() {
     ? photos.filter(p => p.folder_id === selectedFolderId)
     : photos.filter(p => !p.folder_id);
 
+  // Wrapper functions for FolderTree
+  const handleCreateFolder = async (name: string, parentFolderId?: string) => {
+    await createFolder(projectId, name, parentFolderId);
+  };
+
+  const handleUpdateFolder = async (id: string, name: string, parentFolderId?: string) => {
+    await updateFolder(id, name, parentFolderId);
+  };
+
   const compressImage = async (file: File, qualityLevel: QualityLevel): Promise<File> => {
     return new Promise((resolve) => {
       const reader = new FileReader();
@@ -289,9 +298,9 @@ export default function ProjectDetailPage() {
               folders={folders}
               selectedFolderId={selectedFolderId}
               onSelectFolder={setSelectedFolderId}
-              onCreateFolder={createFolder}
+              onCreateFolder={handleCreateFolder}
               onDeleteFolder={deleteFolder}
-              onUpdateFolder={updateFolder}
+              onUpdateFolder={handleUpdateFolder}
             />
           )}
         </div>
