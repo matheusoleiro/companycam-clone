@@ -653,10 +653,10 @@ export default function ProjectDetailPage() {
                 return (
                   <div
                     key={photo.id}
-                    className={`relative group rounded-lg overflow-hidden cursor-pointer transition-all ${
+                    className={`relative group rounded-lg overflow-hidden cursor-grab active:cursor-grabbing transition-all ${
                       isSelected ? 'ring-2 ring-blue-500' : ''
                     }`}
-                    draggable
+                    draggable={true}
                     onDragStart={(e) => {
                       if (!isSelected) {
                         setSelectedPhotoIds(new Set([photo.id]));
@@ -727,7 +727,7 @@ export default function ProjectDetailPage() {
               return (
                 <div
                   key={photo.id}
-                  draggable
+                  draggable={true}
                   onDragStart={(e) => {
                     if (!isSelected) {
                       setSelectedPhotoIds(new Set([photo.id]));
