@@ -32,7 +32,6 @@ export function Button({
       hover:bg-[var(--color-accent-dark)]
       active:bg-[var(--color-accent-dark)]
       disabled:opacity-50 disabled:cursor-not-allowed
-      transition-smooth
       shadow-sm hover:shadow-md
     `,
     secondary: `
@@ -40,25 +39,21 @@ export function Button({
       border border-[var(--color-border)]
       hover:border-[var(--color-border)] hover:bg-[var(--color-stone-200)]
       disabled:opacity-50 disabled:cursor-not-allowed
-      transition-smooth
     `,
     ghost: `
       bg-transparent text-[var(--color-accent-main)]
       hover:bg-[var(--color-stone-100)]
       disabled:opacity-50 disabled:cursor-not-allowed
-      transition-smooth
     `,
     danger: `
       bg-[var(--color-danger)] text-white
       hover:opacity-90
       disabled:opacity-50 disabled:cursor-not-allowed
-      transition-smooth
     `,
     success: `
       bg-[var(--color-success)] text-white
       hover:opacity-90
       disabled:opacity-50 disabled:cursor-not-allowed
-      transition-smooth
     `,
   };
 
