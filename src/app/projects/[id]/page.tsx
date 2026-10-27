@@ -389,7 +389,7 @@ export default function ProjectDetailPage() {
     <MainLayout>
       <div className="flex h-screen gap-4 px-4 py-6">
         {/* Sidebar with Folders */}
-        <div className="w-56 border-r border-slate-200 pr-4 overflow-y-auto">
+        <div className="w-72 border-r border-slate-200 pr-4 overflow-y-auto">
           <h2 className="text-lg font-bold text-slate-900 mb-4">Folders</h2>
           {isLoadingFolders ? (
             <div className="text-slate-600 text-sm">Loading folders...</div>
